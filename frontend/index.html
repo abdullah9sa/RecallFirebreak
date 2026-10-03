@@ -3,315 +3,799 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RecallFirebreak — Clinical Circuit Breaker & Sentinel Command</title>
+  <title>RecallFirebreak — Incident Lifecycle & Autonomous Supply Circuit Breaker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Global Navigation & Telemetry Ribbon -->
-  <header class="global-header">
-    <div class="header-left">
+  <!-- Global Navigation Header with 4-Step Lifecycle Stepper -->
+  <header class="app-header">
+    <div class="header-brand-wrap">
       <div class="brand">
         <span class="brand-shield">🛡️</span>
         <div class="brand-text">
-          <span class="brand-title">RecallFirebreak</span>
-          <span class="brand-sub">Region Stockholm · Clinical Circuit Breaker</span>
+          <span class="brand-title">RECALLFIREBREAK</span>
+          <span class="brand-sub">Region Stockholm · Supply Sentinel</span>
         </div>
       </div>
-      <div class="status-chip online" id="daemon-status">
+      <div class="daemon-chip online" id="daemon-chip">
         <span class="pulse-dot"></span>
-        <span class="status-label">SENTINEL_DAEMON_ACTIVE</span>
+        <span class="chip-text">DAEMON ACTIVE</span>
       </div>
     </div>
 
-    <div class="telemetry-ribbon">
-      <div class="telemetry-chip condense-chip" title="Condense token compaction gateway">
-        <span class="chip-tag">CONDENSE.CHAT</span>
-        <span class="chip-val" id="condense-stats">1,840 → 410 tok (-77%)</span>
-      </div>
-      <div class="telemetry-chip">
-        <span class="chip-tag">LOCKOUT SLA</span>
-        <span class="chip-val" id="telemetry-lockout">32ms</span>
-      </div>
-      <div class="telemetry-chip">
-        <span class="chip-tag">PIPELINE SLA</span>
-        <span class="chip-val" id="telemetry-pipeline">Idle</span>
-      </div>
-    </div>
-
-    <div class="header-controls">
-      <button id="btn-sound" class="btn btn-outline" title="Toggle audio alerts">
-        <span id="sound-icon">🔊</span> <span id="sound-text">Sound: ON</span>
+    <!-- Linear 4-Step Operational Stepper -->
+    <nav class="lifecycle-stepper">
+      <button class="step-btn active" data-step="1" id="step-tab-1">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <span class="step-name">THREAT RADAR</span>
+          <span class="step-status" id="step-status-1">Feeds Live</span>
+        </div>
       </button>
-      <button id="btn-reset" class="btn btn-danger-outline" title="Reset all state to baseline">
+      <span class="step-arrow">──►</span>
+
+      <button class="step-btn" data-step="2" id="step-tab-2">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <span class="step-name">KILL-SWITCH</span>
+          <span class="step-status" id="step-status-2">Ready</span>
+        </div>
+      </button>
+      <span class="step-arrow">──►</span>
+
+      <button class="step-btn" data-step="3" id="step-tab-3">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <span class="step-name">DEPLETION</span>
+          <span class="step-status" id="step-status-3">11.4d Stock</span>
+        </div>
+      </button>
+      <span class="step-arrow">──►</span>
+
+      <button class="step-btn" data-step="4" id="step-tab-4">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <span class="step-name">SOURCING & PO</span>
+          <span class="step-status" id="step-status-4">Standby</span>
+        </div>
+      </button>
+    </nav>
+
+    <!-- Header Controls & Settings -->
+    <div class="header-actions">
+      <div class="telemetry-badge condense-badge" title="Condense token compaction gateway">
+        <span class="t-tag">CONDENSE</span>
+        <span class="t-val" id="condense-stat">-77% tok (120ms)</span>
+      </div>
+      <button id="btn-sound" class="btn btn-outline" title="Toggle audio buzzer & chime">
+        <span id="sound-icon">🔊</span> <span id="sound-label">Sound</span>
+      </button>
+      <button id="btn-reset" class="btn btn-danger-outline" title="Wipe all state back to baseline">
         <span>↺ Reset Demo</span>
+      </button>
+      <button id="btn-open-settings" class="btn btn-outline" title="Integrations & Enterprise Topology">
+        <span>⚙ Settings</span>
       </button>
     </div>
   </header>
 
-  <!-- Main Split-Screen Workspace -->
-  <main class="split-workspace">
-    <!-- PANEL 1: Frontline Dispensary Register -->
-    <section class="panel panel-pos" id="panel-pos">
-      <div class="panel-header">
-        <div class="panel-header-title">
-          <span class="panel-tag">PANEL 1</span>
-          <h2>Frontline Dispensary Register</h2>
+  <!-- Main View Container for Lifecycle Steps -->
+  <main class="lifecycle-main">
+
+    <!-- ====================================================================
+         STEP 1: THREAT RADAR (Feeds, Uploads & Bulletin Intake)
+         ==================================================================== -->
+    <section class="step-view active" id="view-step-1">
+      <div class="view-banner">
+        <div class="banner-title">
+          <span class="banner-step-tag">STEP 1</span>
+          <h2>Threat Radar & Regulatory Ingestion</h2>
         </div>
-        <div class="terminal-meta">
-          <span>TERM-04 · Karolinska Apoteket</span>
-          <span class="badge badge-pos-online">POINT-OF-SALE READY</span>
+        <div class="sources-pill-row">
+          <span class="source-pill active"><span class="dot-sm">●</span> Läkemedelsverket RSS: LIVE</span>
+          <span class="source-pill active"><span class="dot-sm">●</span> EMA Rapid Alert: LIVE</span>
+          <span class="source-pill active"><span class="dot-sm">●</span> FDA MedWatch Webhook: LISTENING</span>
+          <button class="btn btn-xs btn-outline" id="btn-add-source">+ Add Source</button>
         </div>
       </div>
 
-      <div class="barcode-deck-container">
-        <div class="deck-header">
-          <h3>Medication Scanning Deck</h3>
-          <p class="section-hint">Click any drug package to simulate laser scanning at POS checkout.</p>
-        </div>
-
-        <div class="medication-grid">
-          <!-- Box A: Safe Amimox -->
-          <div class="med-card" id="card-box-a" data-gtin="07350012345678" data-lot="L1100A">
-            <div class="laser-scanner-line" id="laser-a"></div>
-            <div class="med-card-header">
-              <span class="badge badge-safe">SAFE BATCH</span>
-              <span class="vnr-tag">Vnr 123456</span>
-            </div>
-            <div class="med-card-body">
-              <h4 class="med-name">Amimox 500 mg</h4>
-              <p class="med-sub">Amoxicillin · 20 kapslar</p>
-              <div class="med-meta-grid">
-                <div><span class="lbl">GTIN:</span> <span class="mono">07350012345678</span></div>
-                <div><span class="lbl">LOT:</span> <span class="mono bold">L1100A</span></div>
-                <div><span class="lbl">EXP:</span> <span class="mono">2027-08</span></div>
-                <div><span class="lbl">ATC:</span> <span class="mono">J01CA04</span></div>
+      <div class="step-grid grid-2col">
+        <!-- Left: Dropzone & Simulators -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Dropzone & Bulletin Intake Feeder</h3>
+            <span class="header-note">Raw PDF / Text Bulletin Parser</span>
+          </div>
+          <div class="card-body">
+            <div class="dropzone-box" id="dropzone-box">
+              <span class="dropzone-icon">📄</span>
+              <div class="dropzone-text">
+                <strong>Drag & drop regulatory defect PDF</strong>
+                <p>or paste Swedish Läkemedelsverket bulletin URL</p>
               </div>
             </div>
-            <div class="barcode-graphic">
-              <div class="fake-barcode"></div>
-              <span class="barcode-num">07350012345678</span>
-            </div>
-            <button class="btn btn-scan" id="btn-scan-a">⚡ Scan Box A</button>
-          </div>
 
-          <!-- Box B: Target Recalled Lot -->
-          <div class="med-card med-target" id="card-box-b" data-gtin="07350012345678" data-lot="L9824B">
-            <div class="laser-scanner-line" id="laser-b"></div>
-            <div class="med-card-header">
-              <span class="badge badge-target" id="badge-b">RECALL TARGET</span>
-              <span class="vnr-tag">Vnr 123456</span>
+            <div class="quick-sim-group">
+              <span class="lbl-caps">One-Click Demonstration Triggers:</span>
+              <button class="btn btn-danger-hero" id="btn-sim-class1">
+                <span class="sim-icon">⚠️</span>
+                <div class="sim-text">
+                  <strong>Simulate Class 1 Recall (Amimox Contamination)</strong>
+                  <span>Synthetic glass particles detected · Immediate kill-switch & emergency PO</span>
+                </div>
+              </button>
+
+              <button class="btn btn-info-hero" id="btn-sim-class3">
+                <span class="sim-icon">ℹ️</span>
+                <div class="sim-text">
+                  <strong>Simulate Class 3 Defect (Alvedon Typography Misprint)</strong>
+                  <span>Cosmetic package print flaw · Autonomous audit note; NO register lockout</span>
+                </div>
+              </button>
             </div>
-            <div class="med-card-body">
-              <h4 class="med-name">Amimox 500 mg</h4>
-              <p class="med-sub">Amoxicillin · 20 kapslar</p>
-              <div class="med-meta-grid">
-                <div><span class="lbl">GTIN:</span> <span class="mono">07350012345678</span></div>
-                <div><span class="lbl">LOT:</span> <span class="mono bold text-crimson">L9824B</span></div>
-                <div><span class="lbl">EXP:</span> <span class="mono">2026-11</span></div>
-                <div><span class="lbl">ATC:</span> <span class="mono">J01CA04</span></div>
+
+            <!-- Parser Telemetry Card -->
+            <div class="telemetry-card">
+              <div class="tc-header">
+                <span class="lbl-caps">Live Parser Telemetry (Condense Proxy Gateway)</span>
+                <span class="badge badge-success" id="schema-badge">Pydantic v2 Validated</span>
+              </div>
+              <div class="tc-grid">
+                <div><span class="tc-lbl">Token Pruning:</span> <span class="mono bold text-success" id="tel-pruning">1,840 → 390t (-78.8%)</span></div>
+                <div><span class="tc-lbl">Gateway Latency:</span> <span class="mono" id="tel-latency">120ms</span></div>
+                <div><span class="tc-lbl">Target Model:</span> <span class="mono">Gemini 3.8 Flash</span></div>
+                <div><span class="tc-lbl">Status:</span> <span class="mono bold text-primary" id="tel-status">Standby</span></div>
               </div>
             </div>
-            <div class="barcode-graphic">
-              <div class="fake-barcode"></div>
-              <span class="barcode-num">07350012345678</span>
-            </div>
-            <button class="btn btn-scan" id="btn-scan-b">⚡ Scan Box B (Target)</button>
           </div>
+        </div>
 
-          <!-- Box C: Control Alvedon -->
-          <div class="med-card" id="card-box-c" data-gtin="07350099999999" data-lot="P4401Z">
-            <div class="laser-scanner-line" id="laser-c"></div>
-            <div class="med-card-header">
-              <span class="badge badge-control">CONTROL / CLASS 3</span>
-              <span class="vnr-tag">Vnr 998877</span>
-            </div>
-            <div class="med-card-body">
-              <h4 class="med-name">Alvedon 500 mg</h4>
-              <p class="med-sub">Paracetamol · 20 tabletter</p>
-              <div class="med-meta-grid">
-                <div><span class="lbl">GTIN:</span> <span class="mono">07350099999999</span></div>
-                <div><span class="lbl">LOT:</span> <span class="mono bold">P4401Z</span></div>
-                <div><span class="lbl">EXP:</span> <span class="mono">2028-02</span></div>
-                <div><span class="lbl">ATC:</span> <span class="mono">N02BE01</span></div>
+        <!-- Right: Real-Time Bulletin Feed Stream -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Real-Time Bulletin Feed Stream</h3>
+            <span class="header-note" id="feed-count">3 bulletins indexed</span>
+          </div>
+          <div class="card-body feed-card-body">
+            <div class="bulletin-feed-list" id="bulletin-feed-list">
+              <!-- Class 1 Item -->
+              <div class="feed-item item-class1" id="feed-item-amimox">
+                <div class="feed-item-header">
+                  <span class="badge badge-danger">CLASS I: CRITICAL</span>
+                  <span class="feed-time">2 mins ago</span>
+                </div>
+                <h4 class="feed-title">Amimox (Amoxicillin 500 mg) — Läkemedelsverket</h4>
+                <div class="feed-meta-row">
+                  <span><strong>GTIN:</strong> <span class="mono">07350012345678</span></span>
+                  <span><strong>Lots:</strong> <span class="mono text-crimson bold">L9824B, L9824C</span></span>
+                  <span><strong>ATC:</strong> <span class="mono">J01CA04</span></span>
+                </div>
+                <p class="feed-defect"><strong>Defect:</strong> Particulate precipitation of synthetic microscopic polymer and metallic fragments in capsules. Severe acute mucosal threat.</p>
+                <div class="feed-footer">
+                  <span class="feed-status-tag" id="feed-amimox-status">PROCESSED IN 1.18s</span>
+                  <button class="btn btn-xs btn-primary" id="btn-view-action-1">View Action ──►</button>
+                </div>
+              </div>
+
+              <!-- Class 2 Item -->
+              <div class="feed-item item-class2">
+                <div class="feed-item-header">
+                  <span class="badge badge-warning">CLASS II: DEFECT</span>
+                  <span class="feed-time">3 hours ago</span>
+                </div>
+                <h4 class="feed-title">Omeprazol 20 mg enterokapslar — Sandoz AB</h4>
+                <div class="feed-meta-row">
+                  <span><strong>GTIN:</strong> <span class="mono">07350044556677</span></span>
+                  <span><strong>Lot:</strong> <span class="mono">K1092A</span></span>
+                  <span><strong>ATC:</strong> <span class="mono">A02BC01</span></span>
+                </div>
+                <p class="feed-defect"><strong>Defect:</strong> Dissolution delay at pH 6.8 exceeding monograph specifications by 12% in accelerated 6-month stability study.</p>
+                <div class="feed-footer">
+                  <span class="feed-status-tag">BATCH RECALLED · ALTERNATIVE STOCKED</span>
+                  <span class="feed-action-note">Restocked via AstraZeneca</span>
+                </div>
+              </div>
+
+              <!-- Class 3 Item -->
+              <div class="feed-item item-class3" id="feed-item-alvedon">
+                <div class="feed-item-header">
+                  <span class="badge badge-info">CLASS III: MINOR</span>
+                  <span class="feed-time">Yesterday</span>
+                </div>
+                <h4 class="feed-title">Alvedon 500 mg filmdragerade — Haleon Sweden AB</h4>
+                <div class="feed-meta-row">
+                  <span><strong>GTIN:</strong> <span class="mono">07350099999999</span></span>
+                  <span><strong>Lot:</strong> <span class="mono">P4401Z</span></span>
+                  <span><strong>ATC:</strong> <span class="mono">N02BE01</span></span>
+                </div>
+                <p class="feed-defect"><strong>Defect:</strong> Secondary carton flap typography misprint (PIL date revision reads 02/2026 instead of 03/2026). Chemical purity 100% compliant.</p>
+                <div class="feed-footer">
+                  <span class="feed-status-tag text-muted">AUDIT NOTE LOGGED · DISPENSING NOMINAL</span>
+                  <span class="feed-action-note">No Lockout Engaged</span>
+                </div>
               </div>
             </div>
-            <div class="barcode-graphic">
-              <div class="fake-barcode"></div>
-              <span class="barcode-num">07350099999999</span>
-            </div>
-            <button class="btn btn-scan" id="btn-scan-c">⚡ Scan Box C (Control)</button>
           </div>
         </div>
       </div>
 
-      <!-- POS Itemized Ledger -->
-      <div class="pos-ledger-container">
-        <div class="ledger-header">
-          <h3>Dispensing Register Audit Log</h3>
-          <span class="ledger-count" id="ledger-count">0 items scanned</span>
-        </div>
-        <div class="ledger-table-wrap">
-          <table class="ledger-table">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Product</th>
-                <th>Lot #</th>
-                <th>Price</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="ledger-tbody">
-              <tr class="empty-row">
-                <td colspan="5">No scans registered. Click a medication box above to begin.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- PANEL 2: Sentinel Surveillance & Autonomous Procurement -->
-    <section class="panel panel-sentinel" id="panel-sentinel">
-      <div class="panel-header">
-        <div class="panel-header-title">
-          <span class="panel-tag">PANEL 2</span>
-          <h2>Sentinel Surveillance & Procurement Desk</h2>
-        </div>
-        <div class="terminal-meta">
-          <span class="badge badge-gemini">GEMINI 3.8 FLASH · TOOL-CALLING</span>
-        </div>
-      </div>
-
-      <!-- Regulatory Intake Section -->
-      <div class="intake-section">
-        <div class="intake-header">
-          <h3>Regulatory Bulletin Intake Feeder</h3>
-          <span class="intake-source">Läkemedelsverket / EMA Directives</span>
-        </div>
-
-        <div class="sample-triggers-row">
-          <button class="btn-sample btn-sample-class1" id="btn-trigger-class1">
-            <span class="trigger-icon">⚠️</span>
-            <div class="trigger-text">
-              <span class="trigger-title">Load Class 1: Amimox Contamination</span>
-              <span class="trigger-desc">Toxic Particulates → Triggers Kill-Switch & Emergency PO</span>
-            </div>
-          </button>
-
-          <button class="btn-sample btn-sample-class3" id="btn-trigger-class3">
-            <span class="trigger-icon">ℹ️</span>
-            <div class="trigger-text">
-              <span class="trigger-title">Load Class 3: Alvedon Typography Misprint</span>
-              <span class="trigger-desc">Packaging Error → Autonomous Audit Only; NO Lockout</span>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Regional Inventory Run-Rate Burndown -->
-      <div class="inventory-gauge-card">
-        <div class="gauge-header">
-          <div class="gauge-title-wrap">
-            <h4>Karolinska Hospital · Regional Supply Reserve</h4>
-            <span class="stock-subtitle">Amoxicillin 500mg (Daily Burn Rate: 400 units/day)</span>
-          </div>
-          <div class="days-indicator" id="days-indicator">
-            <span class="days-num" id="days-val">11.4</span>
-            <span class="days-unit">DAYS RESERVE</span>
-          </div>
-        </div>
-
-        <div class="progress-bar-container">
-          <div class="progress-bar-track">
-            <div class="progress-bar-fill fill-nominal" id="progress-fill" style="width: 81%;"></div>
-            <div class="threshold-marker" style="left: 28.5%;" title="Critical Shortage Floor (4 Days)">
-              <span class="marker-label">4-DAY FLOOR</span>
-            </div>
-          </div>
-        </div>
-        <div class="gauge-footer">
-          <span id="stock-units-label">4,560 usable units of 4,560 total stock</span>
-          <span class="badge badge-stock-status" id="stock-status-badge">RESERVE NOMINAL</span>
-        </div>
-      </div>
-
-      <!-- Staged Purchase Order Card (Hidden by default until agent drafts it) -->
-      <div class="po-card-container hidden" id="po-card">
-        <div class="po-card-header">
-          <div class="po-badge-group">
-            <span class="badge badge-po-urgent">EMERGENCY REQUISITION STAGED</span>
-            <span class="po-id mono" id="po-id-tag">PO-2026-0912</span>
-          </div>
-          <span class="po-sla">12-HOUR DELIVERY SLA</span>
-        </div>
-
-        <div class="po-card-body">
-          <div class="po-substitute-info">
-            <h4 class="substitute-name" id="po-sub-name">Spektramox 500mg/125mg</h4>
-            <p class="substitute-sub" id="po-sub-desc">WHO ATC: J01CR02 · Level 4 Bioequivalent</p>
-          </div>
-
-          <div class="po-meta-grid">
-            <div class="po-meta-item">
-              <span class="lbl">Supplier:</span>
-              <span class="val" id="po-supplier">Tamro AB Sweden</span>
-            </div>
-            <div class="po-meta-item">
-              <span class="lbl">Quantity:</span>
-              <span class="val mono bold" id="po-units">4,400 units</span>
-            </div>
-            <div class="po-meta-item">
-              <span class="lbl">Est. Total:</span>
-              <span class="val mono bold text-primary" id="po-cost">110,000 SEK</span>
-            </div>
-            <div class="po-meta-item">
-              <span class="lbl">Deficit Restored:</span>
-              <span class="val text-success">14.0 Days</span>
-            </div>
-          </div>
-
-          <div class="po-rationale-box">
-            <span class="lbl">Clinical Rationale:</span>
-            <p class="rationale-text" id="po-rationale">Batch L9824B quarantined. Reserve dropped below 4-day threshold. Spektramox verified in stock for immediate hospital restock.</p>
-          </div>
-        </div>
-
-        <div class="po-card-footer">
-          <div class="human-guardrail-note">
-            <span class="guardrail-icon">🛡️</span>
-            <span>Human-in-the-Loop Safety Rule: AI Agent cannot auto-execute financial orders.</span>
-          </div>
-          <button class="btn btn-approve-po" id="btn-approve-po">
-            ✓ Approve & Transmit Purchase Order
-          </button>
-        </div>
-      </div>
-
-      <!-- Live Autonomous Agent Trace Stream -->
-      <div class="trace-container">
-        <div class="trace-header">
+      <!-- Live Agent Trace Console (Step 1 Integration) -->
+      <div class="card trace-card-container">
+        <div class="card-header">
           <div class="trace-header-left">
             <span class="pulse-dot-sm"></span>
-            <h3>Autonomous Agent Live Decision Trace</h3>
+            <h3>Autonomous Agent Real-Time Decision Stream</h3>
           </div>
-          <span class="trace-status" id="trace-status-text">Standby</span>
+          <span class="trace-status-chip" id="step1-trace-status">Standby</span>
         </div>
-
-        <div class="trace-stream" id="trace-stream">
-          <div class="trace-empty">
-            <span class="trace-empty-icon">⚡</span>
-            <p>Click a regulatory bulletin above to observe Gemini's tool-calling sequence in real time.</p>
+        <div class="trace-console" id="trace-console-stream">
+          <div class="trace-empty-state">
+            <span>⚡ Click "Simulate Class 1 Recall" above to observe Gemini's tool-calling sequence in real time.</span>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- ====================================================================
+         STEP 2: EDGE KILL-SWITCH & BRANCH TOPOLOGY
+         ==================================================================== -->
+    <section class="step-view" id="view-step-2">
+      <div class="view-banner">
+        <div class="banner-title">
+          <span class="banner-step-tag">STEP 2</span>
+          <h2>Edge Kill-Switch & Regional Branch Containment</h2>
+        </div>
+        <div class="containment-banner" id="containment-banner">
+          <span class="containment-badge" id="containment-badge">STANDBY: REGISTERS ACTIVE</span>
+          <span class="containment-time" id="containment-time">Broadcast Latency: 32ms via SSE Duplex Push</span>
+        </div>
+      </div>
+
+      <div class="step-grid grid-2col">
+        <!-- Left: Regional Branch Hierarchy Tree -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Regional Branch Topology (Region Stockholm)</h3>
+            <span class="header-note">Enterprise Endpoint Map</span>
+          </div>
+          <div class="card-body">
+            <p class="topology-intro">Real-time point-of-sale register lockout state across regional medical dispensaries.</p>
+            
+            <div class="topology-tree" id="topology-tree">
+              <!-- Karolinska Node -->
+              <div class="tree-node facility-node open" id="node-karolinska">
+                <div class="tree-node-row">
+                  <span class="tree-toggle">▼</span>
+                  <span class="tree-icon">🏥</span>
+                  <span class="tree-name">Karolinska University Hospital Solna</span>
+                  <span class="tree-status-badge status-open" id="badge-karolinska">ACTIVE (6 SCANNERS)</span>
+                </div>
+                <div class="tree-children">
+                  <div class="tree-child-row">
+                    <span class="tree-branch">├─</span>
+                    <span class="tree-icon">💊</span>
+                    <span class="child-name">Central Dispensary Level 02</span>
+                    <span class="child-detail" id="scanners-karolinska-1">4/4 Scanners Operational</span>
+                  </div>
+                  <div class="tree-child-row">
+                    <span class="tree-branch">└─</span>
+                    <span class="tree-icon">🚨</span>
+                    <span class="child-name">Emergency Ward A Dispensary</span>
+                    <span class="child-detail" id="scanners-karolinska-2">2/2 Scanners Operational</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Södersjukhuset Node -->
+              <div class="tree-node facility-node open" id="node-soder">
+                <div class="tree-node-row">
+                  <span class="tree-toggle">▼</span>
+                  <span class="tree-icon">🏥</span>
+                  <span class="tree-name">Södersjukhuset Hospital</span>
+                  <span class="tree-status-badge status-open" id="badge-soder">ACTIVE (6 SCANNERS)</span>
+                </div>
+                <div class="tree-children">
+                  <div class="tree-child-row">
+                    <span class="tree-branch">└─</span>
+                    <span class="tree-icon">💊</span>
+                    <span class="child-name">Main Clinical Pharmacy</span>
+                    <span class="child-detail" id="scanners-soder">6/6 Scanners Operational</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Apoteket Vasagatan Node -->
+              <div class="tree-node facility-node open" id="node-apoteket">
+                <div class="tree-node-row">
+                  <span class="tree-toggle">▼</span>
+                  <span class="tree-icon">🏪</span>
+                  <span class="tree-name">Apoteket Vasagatan (Retail Hub)</span>
+                  <span class="tree-status-badge status-open" id="badge-apoteket">ACTIVE (2 SCANNERS)</span>
+                </div>
+                <div class="tree-children">
+                  <div class="tree-child-row">
+                    <span class="tree-branch">└─</span>
+                    <span class="tree-icon">🖥️</span>
+                    <span class="child-name">Checkout Register 01 & 02</span>
+                    <span class="child-detail" id="scanners-apoteket">2/2 Scanners Operational</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="topology-footer">
+              <div><strong>TOTAL ENTERPRISE REACH:</strong> 3 Facilities · 14 Scanners Active</div>
+              <div><strong>PROTOCOL:</strong> Fast Broadcast Frame (<span class="mono">SSE / WebSocket</span>)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Register Simulator -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Interactive Register Simulator</h3>
+            <span class="badge badge-pos-online">Terminal: Karolinska Solna POS-01</span>
+          </div>
+          <div class="card-body">
+            <p class="section-hint">Click any drug package to simulate laser scanning at frontline dispensing:</p>
+
+            <div class="med-scanner-grid">
+              <!-- Box A: Safe Amimox -->
+              <div class="med-box" id="step2-box-a" data-gtin="07350012345678" data-lot="L1100A">
+                <div class="laser-line" id="step2-laser-a"></div>
+                <div class="box-badge-row">
+                  <span class="badge badge-safe">SAFE BATCH</span>
+                  <span class="mono-xs">Vnr 123456</span>
+                </div>
+                <h4 class="box-title">Amimox 500 mg</h4>
+                <div class="box-meta">
+                  <span>LOT: <strong class="mono">L1100A</strong></span>
+                  <span>EXP: 2027-08</span>
+                </div>
+                <div class="mini-barcode"></div>
+                <button class="btn btn-xs btn-scan" id="step2-btn-scan-a">⚡ Scan Box A (Safe)</button>
+              </div>
+
+              <!-- Box B: Target Recalled Lot -->
+              <div class="med-box target-box" id="step2-box-b" data-gtin="07350012345678" data-lot="L9824B">
+                <div class="laser-line" id="step2-laser-b"></div>
+                <div class="box-badge-row">
+                  <span class="badge badge-target" id="step2-badge-b">RECALL TARGET</span>
+                  <span class="mono-xs">Vnr 123456</span>
+                </div>
+                <h4 class="box-title">Amimox 500 mg</h4>
+                <div class="box-meta">
+                  <span>LOT: <strong class="mono text-crimson">L9824B</strong></span>
+                  <span>EXP: 2026-11</span>
+                </div>
+                <div class="mini-barcode"></div>
+                <button class="btn btn-xs btn-scan" id="step2-btn-scan-b">⚡ Scan Box B (Target)</button>
+              </div>
+
+              <!-- Box C: Control Alvedon -->
+              <div class="med-box" id="step2-box-c" data-gtin="07350099999999" data-lot="P4401Z">
+                <div class="laser-line" id="step2-laser-c"></div>
+                <div class="box-badge-row">
+                  <span class="badge badge-control">CONTROL</span>
+                  <span class="mono-xs">Vnr 998877</span>
+                </div>
+                <h4 class="box-title">Alvedon 500 mg</h4>
+                <div class="box-meta">
+                  <span>LOT: <strong class="mono">P4401Z</strong></span>
+                  <span>EXP: 2028-02</span>
+                </div>
+                <div class="mini-barcode"></div>
+                <button class="btn btn-xs btn-scan" id="step2-btn-scan-c">⚡ Scan Box C (Control)</button>
+              </div>
+            </div>
+
+            <!-- Lockout Climax Banner (when locked) -->
+            <div class="lockout-hero-banner hidden" id="lockout-hero-banner">
+              <div class="lh-header">
+                <span class="lh-icon">🚨</span>
+                <div>
+                  <strong class="mono">423 DISPENSE_BLOCKED: TOXIC HAZARD</strong>
+                  <p>Läkemedelsverket Emergency Order #LV-2026-0912 · Lot L9824B</p>
+                </div>
+              </div>
+              <div class="lh-action">
+                ACTION: RETAIN IN RED HAZARD BIN · DO NOT DISPENSE TO PATIENT
+              </div>
+            </div>
+
+            <!-- Itemized Receipt Table -->
+            <div class="scan-ledger-wrap">
+              <span class="lbl-caps">Terminal Scan Transaction Ledger</span>
+              <table class="ledger-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Product</th>
+                    <th>Lot</th>
+                    <th>Price</th>
+                    <th>Outcome</th>
+                  </tr>
+                </thead>
+                <tbody id="step2-ledger-tbody">
+                  <tr class="empty-row">
+                    <td colspan="5">No scans registered. Click a medication box above to scan.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="step-nav-row">
+              <button class="btn btn-outline" id="btn-back-to-1">◄ Back to Threat Radar</button>
+              <button class="btn btn-primary" id="btn-to-depletion">Proceed to Depletion Analysis ──►</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         STEP 3: DEPLETION & RUN-RATE CALCULUS
+         ==================================================================== -->
+    <section class="step-view" id="view-step-3">
+      <div class="view-banner">
+        <div class="banner-title">
+          <span class="banner-step-tag">STEP 3</span>
+          <h2>Depletion & Regional Run-Rate Calculus</h2>
+        </div>
+        <div class="deficit-banner" id="deficit-banner">
+          <span class="badge badge-danger" id="deficit-tag">CRITICAL SHORTAGE PROJECTED WITHIN 72 HOURS</span>
+          <span class="mono-sm">Buffer Floor Breach: 3.2 Days Remaining</span>
+        </div>
+      </div>
+
+      <div class="step-grid grid-2col">
+        <!-- Left: Burn-Down Trajectory Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Burn-Down Trajectory (Karolinska Solna Reserve)</h3>
+            <span class="header-note">Days-of-Supply Projection</span>
+          </div>
+          <div class="card-body">
+            <!-- Custom Clean SVG Burndown Chart -->
+            <div class="burndown-chart-wrap">
+              <svg class="burndown-svg" viewBox="0 0 500 240" preserveAspectRatio="none">
+                <!-- Grid Lines -->
+                <line x1="50" y1="20" x2="480" y2="20" stroke="#E2E8F0" stroke-dasharray="4" />
+                <text x="15" y="24" class="svg-lbl">14d (Target)</text>
+
+                <line x1="50" y1="60" x2="480" y2="60" stroke="#CBD5E1" stroke-dasharray="4" />
+                <text x="15" y="64" class="svg-lbl">11.4d (Pre)</text>
+
+                <line x1="50" y1="120" x2="480" y2="120" stroke="#FCA5A5" stroke-dasharray="4" />
+                <text x="15" y="124" class="svg-lbl text-crimson">7d (Threshold)</text>
+
+                <line x1="50" y1="170" x2="480" y2="170" stroke="#EF4444" stroke-width="2" />
+                <text x="15" y="174" class="svg-lbl bold text-crimson">4d Floor</text>
+
+                <line x1="50" y1="210" x2="480" y2="210" stroke="#94A3B8" />
+
+                <!-- Timeline labels -->
+                <text x="80" y="228" class="svg-axis">Mon</text>
+                <text x="170" y="228" class="svg-axis">Tue</text>
+                <text x="260" y="228" class="svg-axis">Wed (Breach)</text>
+                <text x="350" y="228" class="svg-axis">Thu</text>
+                <text x="440" y="228" class="svg-axis">Fri</text>
+
+                <!-- Normal burn path -->
+                <path d="M 80,60 L 170,75 L 260,90 L 350,105 L 440,120" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="5" />
+
+                <!-- Post-quarantine collapse cliff -->
+                <path id="svg-quarantine-path" d="M 80,60 L 170,185 L 260,205 L 350,210" fill="none" stroke="#DC2626" stroke-width="3" />
+
+                <!-- Markers -->
+                <circle cx="80" cy="60" r="5" fill="#059669" />
+                <text x="85" y="52" class="svg-callout">11.4d</text>
+
+                <circle cx="170" cy="185" r="6" fill="#DC2626" />
+                <text x="180" y="180" class="svg-callout text-crimson bold">POST-RECALL: 3.2d</text>
+              </svg>
+            </div>
+
+            <div class="chart-legend-row">
+              <span class="legend-item"><span class="legend-swatch swatch-grey"></span> Baseline Consumption</span>
+              <span class="legend-item"><span class="legend-swatch swatch-red"></span> Post-Quarantine Deficit (Collapses to 3.2d)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Mathematical Breakdown by Facility -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Inventory Audit by Facility & Run-Rate Calculus</h3>
+            <span class="badge badge-warning">Regional Impact</span>
+          </div>
+          <div class="card-body">
+            <!-- Calculus Formula Callout -->
+            <div class="calculus-formula-box">
+              <span class="formula-title">Depletion Run-Rate Formula:</span>
+              <div class="formula-math mono">
+                Days Remaining = Usable Units / Daily Burn Rate = 1,280 / 400 = <strong>3.2 Days</strong>
+              </div>
+            </div>
+
+            <!-- Karolinska Breakdown -->
+            <div class="facility-audit-block">
+              <div class="fa-header">
+                <strong>Karolinska University Hospital Solna</strong>
+                <span class="badge badge-danger" id="fa-karolinska-status">CRITICAL STOCKOUT</span>
+              </div>
+              <div class="fa-metrics-grid">
+                <div><span class="lbl">Total Pre-Recall:</span> <span class="mono">4,560 units</span></div>
+                <div><span class="lbl">Quarantined Batch:</span> <span class="mono text-crimson bold">3,280 units (L9824B)</span></div>
+                <div><span class="lbl">Usable Inventory:</span> <span class="mono bold text-success" id="fa-usable">1,280 units (L1100A)</span></div>
+                <div><span class="lbl">Daily Consumption:</span> <span class="mono">400 units/day</span></div>
+                <div><span class="lbl">Projected Depletion:</span> <span class="mono bold text-crimson" id="fa-days">3.2 Days</span></div>
+                <div><span class="lbl">Safety Deficit:</span> <span class="mono bold text-primary">4,400 units needed</span></div>
+              </div>
+            </div>
+
+            <!-- Södersjukhuset Breakdown -->
+            <div class="facility-audit-block">
+              <div class="fa-header">
+                <strong>Södersjukhuset Hospital</strong>
+                <span class="badge badge-warning">ELEVATED SHORTAGE</span>
+              </div>
+              <div class="fa-metrics-grid">
+                <div><span class="lbl">Total Pre-Recall:</span> <span class="mono">2,100 units</span></div>
+                <div><span class="lbl">Quarantined Stock:</span> <span class="mono text-crimson">1,400 units</span></div>
+                <div><span class="lbl">Usable Inventory:</span> <span class="mono">700 units</span></div>
+                <div><span class="lbl">Daily Consumption:</span> <span class="mono">170 units/day</span></div>
+                <div><span class="lbl">Projected Depletion:</span> <span class="mono text-warning bold">4.1 Days</span></div>
+                <div><span class="lbl">Status:</span> <span class="badge badge-warning">Buffer Compromised</span></div>
+              </div>
+            </div>
+
+            <div class="regional-summary-alert">
+              <strong>CRITICAL REGIONAL FINDING:</strong>
+              <p>Region Stockholm will exhaust usable pediatric amoxicillin reserves within 72 hours unless emergency bioequivalent replenishment is authorized.</p>
+            </div>
+
+            <div class="step-nav-row">
+              <button class="btn btn-outline" id="btn-back-to-2">◄ Back to Kill-Switch</button>
+              <button class="btn btn-primary" id="btn-to-sourcing">Proceed to Autonomous Sourcing ──►</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         STEP 4: ATC SUBSTITUTION & AUTOMATED PROCUREMENT
+         ==================================================================== -->
+    <section class="step-view" id="view-step-4">
+      <div class="view-banner">
+        <div class="banner-title">
+          <span class="banner-step-tag">STEP 4</span>
+          <h2>WHO ATC Substitution & Automated Procurement</h2>
+        </div>
+        <div class="resolution-banner">
+          <span class="badge badge-success">AUTONOMOUS RESOLUTION: BIOEQUIVALENT FOUND · ORDER STAGED</span>
+          <span class="mono-sm">Target Supplier: Tamro AB Sweden · Priority 12-Hour SLA</span>
+        </div>
+      </div>
+
+      <div class="step-grid grid-2col">
+        <!-- Left: WHO ATC Ontology Resolution Graph -->
+        <div class="card">
+          <div class="card-header">
+            <h3>WHO ATC Taxonomy Resolution Engine</h3>
+            <span class="header-note">Clinical Equivalence Traversal</span>
+          </div>
+          <div class="card-body">
+            <!-- ATC Ontology Graph Visualizer -->
+            <div class="atc-tree-viz">
+              <div class="atc-node atc-recalled">
+                <span class="atc-tag">RECALLED MOLECULE</span>
+                <h4 class="atc-code mono">J01CA04</h4>
+                <p class="atc-substance">Amoxicillin 500 mg Oral (Amimox)</p>
+                <span class="badge badge-danger">L9824B QUARANTINED</span>
+              </div>
+
+              <div class="atc-connector">
+                <span class="connector-line"></span>
+                <span class="connector-label">TRAVERSE LEVEL 4 GROUP SIBLING</span>
+                <span class="connector-arrow">▼</span>
+              </div>
+
+              <div class="atc-node atc-substitute">
+                <span class="atc-tag">RECOMMENDED BIOEQUIVALENT</span>
+                <h4 class="atc-code mono text-primary">J01CR02</h4>
+                <p class="atc-substance">Amoxicillin + Clavulanic Acid 500/125 mg (Spektramox)</p>
+                <span class="badge badge-success">18,500 UNITS AVAILABLE (TAMRO)</span>
+              </div>
+            </div>
+
+            <!-- Clinical Evidence & Validation -->
+            <div class="clinical-evidence-box">
+              <span class="lbl-caps">Clinical Verification Checklist</span>
+              <ul class="evidence-list">
+                <li><span class="check-icon">✓</span> <strong>Strama Sweden Clinical Guidelines:</strong> Approved first-line therapeutic bioequivalent for respiratory/ENT infections.</li>
+                <li><span class="check-icon">✓</span> <strong>Bioequivalence Index:</strong> 0.98 pharmacokinetic match.</li>
+                <li><span class="check-icon">✓</span> <strong>Wholesale Availability:</strong> Tamro AB Kungsängen Logistics Hub verified with 18,500 units on-hand.</li>
+                <li><span class="check-icon">✓</span> <strong>Delivery SLA:</strong> Priority 12-hour emergency hospital courier.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Emergency Purchase Requisition Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Emergency Purchase Requisition</h3>
+            <span class="po-tag mono" id="step4-po-id">PO-2026-0912</span>
+          </div>
+          <div class="card-body">
+            <div class="po-order-summary">
+              <div class="po-item-row">
+                <div>
+                  <h4 class="po-prod-name">Spektramox 500 mg / 125 mg</h4>
+                  <span class="po-substance mono">WHO ATC: J01CR02 · SKU: TAMRO-98311-SE</span>
+                </div>
+                <span class="badge badge-success">IN STOCK</span>
+              </div>
+
+              <div class="po-specs-grid">
+                <div class="spec-cell">
+                  <span class="lbl">Target Supplier:</span>
+                  <span class="val">Tamro AB Sweden</span>
+                </div>
+                <div class="spec-cell">
+                  <span class="lbl">Delivery SLA:</span>
+                  <span class="val bold text-primary">Priority 12-Hour</span>
+                </div>
+                <div class="spec-cell">
+                  <span class="lbl">Required Volume:</span>
+                  <span class="val mono bold" id="step4-po-volume">4,400 Units</span>
+                </div>
+                <div class="spec-cell">
+                  <span class="lbl">Total Contract Price:</span>
+                  <span class="val mono bold text-primary" id="step4-po-cost">110,000 SEK</span>
+                </div>
+              </div>
+
+              <div class="po-rationale-section">
+                <span class="lbl">Audit Decision Rationale (Generated by Sentinel Agent):</span>
+                <p class="rationale-body" id="step4-rationale-text">
+                  Quarantine of Amimox batch L9824B reduced Karolinska reserve to 3.2 days (breaching the 4-day critical safety floor). J01CR02 matched as first-line bioequivalent alternative. 4,400 units restores a secure 14-day regional operational reserve.
+                </p>
+              </div>
+
+              <!-- Human-in-the-Loop Governance Block -->
+              <div class="governance-block">
+                <div class="gov-note">
+                  <span class="gov-icon">🛡️</span>
+                  <div>
+                    <strong>Mandatory Governance Guardrail:</strong>
+                    <p>Financial execution requires human authorization. AI Agent cannot auto-sign procurement contracts.</p>
+                  </div>
+                </div>
+
+                <button class="btn btn-hero-approve" id="btn-step4-approve">
+                  ✓ One-Click Authorize & Send (EDI Dispatch)
+                </button>
+              </div>
+            </div>
+
+            <div class="step-nav-row">
+              <button class="btn btn-outline" id="btn-back-to-3">◄ Back to Depletion</button>
+              <button class="btn btn-outline" id="btn-back-to-start">Return to Threat Radar ↺</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Lockout Modal (The Climax) -->
+  <!-- ====================================================================
+       STEP 5: INTEGRATION HUB & ENTERPRISE MAPPINGS (Slide-Over Drawer)
+       ==================================================================== -->
+  <div class="settings-drawer-backdrop hidden" id="settings-backdrop">
+    <div class="settings-drawer-panel">
+      <div class="drawer-header">
+        <div class="dh-title">
+          <span class="dh-icon">⚙️</span>
+          <div>
+            <h3>Integrations Hub & Enterprise Topology</h3>
+            <span class="dh-sub">Configured Connectors, Webhooks & Hospital Storage Nodes</span>
+          </div>
+        </div>
+        <button class="btn-close-drawer" id="btn-close-settings">✕</button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Section 1: Regulatory Ingestion -->
+        <div class="drawer-section">
+          <h4>1. Regulatory Ingestion Connectors</h4>
+          <div class="connector-list">
+            <div class="connector-card">
+              <div class="cc-header">
+                <strong>Läkemedelsverket Regulatory Feed</strong>
+                <span class="badge badge-success">CONNECTED</span>
+              </div>
+              <div class="cc-meta mono">
+                <span>Protocol: RSS / XML Stream</span>
+                <span>Endpoint: https://lakemedelsverket.se/rss/indragningar</span>
+                <span>Polling: Every 30 seconds</span>
+              </div>
+            </div>
+
+            <div class="connector-card">
+              <div class="cc-header">
+                <strong>EMA Rapid Alert Webhook</strong>
+                <span class="badge badge-success">LISTENING</span>
+              </div>
+              <div class="cc-meta mono">
+                <span>Protocol: HMAC-SHA256 Webhook</span>
+                <span>Secret: whsec_••••••••••••••••</span>
+                <span>Status: 0 missed deliveries (100% SLA)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: ERP / WMS Connectors -->
+        <div class="drawer-section">
+          <h4>2. Hospital ERP & Wholesaler EDI Connectors</h4>
+          <div class="connector-list">
+            <div class="connector-card">
+              <div class="cc-header">
+                <strong>SAP S/4HANA (Karolinska Hospital WMS)</strong>
+                <span class="badge badge-success">CONNECTED</span>
+              </div>
+              <div class="cc-meta mono">
+                <span>Endpoint: https://sap.karolinska.se/api/v2/inventory</span>
+                <span>Auth: OAuth2 Bearer Token</span>
+                <span>Action: In-Memory Quarantine Blocklist Synchronization</span>
+              </div>
+            </div>
+
+            <div class="connector-card">
+              <div class="cc-header">
+                <strong>Tamro Wholesaler EDI Gateway</strong>
+                <span class="badge badge-success">ACTIVE</span>
+              </div>
+              <div class="cc-meta mono">
+                <span>Protocol: AS2 / EDI 850 (Purchase Order)</span>
+                <span>Account: REG-STOCKHOLM-9821</span>
+                <span>Dispatch: Priority Emergency Requisition Queue</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Regional Hospital Nodes -->
+        <div class="drawer-section">
+          <h4>3. Facility & Hospital Node Mapping</h4>
+          <div class="node-mapping-list">
+            <div class="node-pill">
+              <strong>KAROLINSKA-SOLNA</strong>
+              <span>Storage Loc: 0001 (Main) → 0004 (Emergency)</span>
+            </div>
+            <div class="node-pill">
+              <strong>SODERSJUKHUSET</strong>
+              <span>Storage Loc: B01 → B99 (Dispensary)</span>
+            </div>
+            <div class="node-pill">
+              <strong>APOTEKET-VASAGATAN</strong>
+              <span>Register Terminals: POS-01, POS-02</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-full" id="btn-add-node">+ Add Hospital / Retail Branch Node</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Lockout Modal Alert (Climax Warning) -->
   <div class="lockout-modal-backdrop hidden" id="lockout-modal">
     <div class="lockout-modal-card">
       <div class="lockout-alert-header">
@@ -325,15 +809,15 @@
       <div class="lockout-details">
         <div class="lockout-row">
           <span class="k">PRODUCT:</span>
-          <span class="v" id="modal-product">Amimox 500 mg (Amoxicillin)</span>
+          <span class="v">Amimox 500 mg (Amoxicillin)</span>
         </div>
         <div class="lockout-row">
           <span class="k">GTIN:</span>
-          <span class="v mono" id="modal-gtin">07350012345678</span>
+          <span class="v mono">07350012345678</span>
         </div>
         <div class="lockout-row">
           <span class="k">RECALLED LOT:</span>
-          <span class="v mono bold text-crimson" id="modal-lot">L9824B</span>
+          <span class="v mono bold text-crimson">L9824B</span>
         </div>
         <div class="lockout-row">
           <span class="k">AUTHORITY:</span>
@@ -341,7 +825,7 @@
         </div>
         <div class="lockout-row">
           <span class="k">REASON:</span>
-          <span class="v" id="modal-reason">Toxic microscopic particulate precipitation. Oral administration poses acute mucosal & toxicity threat.</span>
+          <span class="v">Toxic microscopic particulate precipitation. Oral administration poses acute mucosal & toxicity threat.</span>
         </div>
       </div>
 
