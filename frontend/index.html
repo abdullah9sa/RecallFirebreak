@@ -92,148 +92,286 @@
       <div class="view-banner">
         <div class="banner-title">
           <span class="banner-step-tag">STEP 1</span>
-          <h2>Threat Radar & Regulatory Ingestion</h2>
+          <div>
+            <h2>Threat Radar &amp; Regulatory Ingestion</h2>
+            <span class="banner-subtitle">Continuous surveillance across Swedish MPA, EMA, and FDA enforcement feeds</span>
+          </div>
         </div>
-        <div class="sources-pill-row">
-          <span class="source-pill active"><span class="dot-sm">●</span> Läkemedelsverket RSS: LIVE</span>
-          <span class="source-pill active"><span class="dot-sm">●</span> EMA Rapid Alert: LIVE</span>
-          <span class="source-pill active"><span class="dot-sm">●</span> FDA MedWatch Webhook: LISTENING</span>
-          <button class="btn btn-xs btn-outline" id="btn-add-source">+ Add Source</button>
+        <div class="banner-actions">
+          <button class="btn btn-outline" id="btn-show-sources">
+            <span>📡 Scraped Sources &amp; Feeds (6)</span>
+          </button>
         </div>
       </div>
 
       <div class="step-grid grid-2col">
-        <!-- Left: Dropzone & Simulators -->
-        <div class="card">
-          <div class="card-header">
-            <h3>Dropzone & Bulletin Intake Feeder</h3>
-            <span class="header-note">Raw PDF / Text Bulletin Parser</span>
+        <!-- Left Column: Dropzone, Simulators, Telemetry, and Latest Sources Checked -->
+        <div class="left-col-stack">
+          <!-- Card 1: Dropzone & Simulators -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Dropzone &amp; Bulletin Intake Feeder</h3>
+              <span class="header-note">Raw PDF / Text Bulletin Parser</span>
+            </div>
+            <div class="card-body">
+              <!-- Functional Drag & Drop Zone -->
+              <div class="dropzone-box" id="dropzone-box" tabindex="0" role="button" aria-label="Drop regulatory bulletin or click to browse">
+                <input type="file" id="bulletin-file-input" accept=".txt,.json,.pdf,.xml" style="display: none;">
+                <div class="dropzone-default" id="dropzone-default-view">
+                  <div class="dropzone-icon-circle">
+                    <span class="dropzone-icon">📥</span>
+                  </div>
+                  <div class="dropzone-text">
+                    <strong class="dropzone-heading">Drag &amp; drop regulatory defect bulletin</strong>
+                    <p class="dropzone-sub">or <span class="dropzone-link">browse files</span> (.txt, .json, .pdf) · Ingests into Gemini agent</p>
+                  </div>
+                </div>
+                <div class="dropzone-preview hidden" id="dropzone-preview-view">
+                  <div class="dfp-row">
+                    <span class="dfp-check">✓</span>
+                    <div class="dfp-info">
+                      <span class="dfp-name mono" id="dfp-filename">bulletin.txt</span>
+                      <span class="dfp-size" id="dfp-size">(1.4 KB)</span>
+                    </div>
+                    <button class="btn btn-xs btn-outline" id="btn-clear-file" title="Clear selection">✕</button>
+                  </div>
+                  <button class="btn btn-xs btn-primary btn-full" id="btn-run-dropped">
+                    <span>⚡ Parse &amp; Trigger Ingestion with Gemini</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Simulators -->
+              <div class="quick-sim-group">
+                <span class="lbl-caps">One-Click Demonstration Triggers:</span>
+                <button class="btn btn-danger-hero" id="btn-sim-class1">
+                  <span class="sim-icon">⚠️</span>
+                  <div class="sim-text">
+                    <strong>Simulate Class 1 Recall (Amimox Contamination)</strong>
+                    <span>Synthetic glass particles detected · Immediate kill-switch &amp; emergency PO</span>
+                  </div>
+                </button>
+
+                <button class="btn btn-info-hero" id="btn-sim-class3">
+                  <span class="sim-icon">ℹ️</span>
+                  <div class="sim-text">
+                    <strong>Simulate Class 3 Defect (Alvedon Typography Misprint)</strong>
+                    <span>Cosmetic package print flaw · Autonomous audit note; NO register lockout</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Parser Telemetry Card -->
+              <div class="telemetry-card">
+                <div class="tc-header">
+                  <span class="lbl-caps">Live Parser Telemetry (Condense Proxy Gateway)</span>
+                  <span class="badge badge-success" id="schema-badge">Pydantic v2 Validated</span>
+                </div>
+                <div class="tc-grid">
+                  <div><span class="tc-lbl">Token Pruning:</span> <span class="mono bold text-success" id="tel-pruning">1,840 → 390t (-78.8%)</span></div>
+                  <div><span class="tc-lbl">Gateway Latency:</span> <span class="mono" id="tel-latency">120ms</span></div>
+                  <div><span class="tc-lbl">Target Model:</span> <span class="mono">Gemini 3.8 Flash</span></div>
+                  <div><span class="tc-lbl">Status:</span> <span class="mono bold text-primary" id="tel-status">Standby</span></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="dropzone-box" id="dropzone-box">
-              <span class="dropzone-icon">📄</span>
-              <div class="dropzone-text">
-                <strong>Drag & drop regulatory defect PDF</strong>
-                <p>or paste Swedish Läkemedelsverket bulletin URL</p>
+
+          <!-- Card 2: Latest Sources Checked (Simple, not much text) -->
+          <div class="card latest-sources-card">
+            <div class="card-header">
+              <div class="header-left-title">
+                <span class="pulse-dot"></span>
+                <h3>Latest Sources Checked</h3>
               </div>
+              <span class="header-note" id="sources-poll-timer">Polled 12s ago</span>
             </div>
-
-            <div class="quick-sim-group">
-              <span class="lbl-caps">One-Click Demonstration Triggers:</span>
-              <button class="btn btn-danger-hero" id="btn-sim-class1">
-                <span class="sim-icon">⚠️</span>
-                <div class="sim-text">
-                  <strong>Simulate Class 1 Recall (Amimox Contamination)</strong>
-                  <span>Synthetic glass particles detected · Immediate kill-switch & emergency PO</span>
+            <div class="card-body sources-feed-body">
+              <div class="sources-checked-feed" id="sources-checked-feed">
+                <div class="source-feed-row">
+                  <span class="badge badge-success mono-xs">200 OK</span>
+                  <div class="source-feed-info">
+                    <span class="source-feed-name">Läkemedelsverket RSS</span>
+                  </div>
+                  <span class="source-feed-time mono-xs" id="time-src-1">12s ago</span>
+                  <span class="source-feed-delta zero mono-xs">0 new</span>
                 </div>
-              </button>
-
-              <button class="btn btn-info-hero" id="btn-sim-class3">
-                <span class="sim-icon">ℹ️</span>
-                <div class="sim-text">
-                  <strong>Simulate Class 3 Defect (Alvedon Typography Misprint)</strong>
-                  <span>Cosmetic package print flaw · Autonomous audit note; NO register lockout</span>
+                <div class="source-feed-row">
+                  <span class="badge badge-success mono-xs">200 OK</span>
+                  <div class="source-feed-info">
+                    <span class="source-feed-name">EMA Rapid Alert System</span>
+                  </div>
+                  <span class="source-feed-time mono-xs" id="time-src-2">42s ago</span>
+                  <span class="source-feed-delta new mono-xs">1 alert</span>
                 </div>
-              </button>
-            </div>
-
-            <!-- Parser Telemetry Card -->
-            <div class="telemetry-card">
-              <div class="tc-header">
-                <span class="lbl-caps">Live Parser Telemetry (Condense Proxy Gateway)</span>
-                <span class="badge badge-success" id="schema-badge">Pydantic v2 Validated</span>
-              </div>
-              <div class="tc-grid">
-                <div><span class="tc-lbl">Token Pruning:</span> <span class="mono bold text-success" id="tel-pruning">1,840 → 390t (-78.8%)</span></div>
-                <div><span class="tc-lbl">Gateway Latency:</span> <span class="mono" id="tel-latency">120ms</span></div>
-                <div><span class="tc-lbl">Target Model:</span> <span class="mono">Gemini 3.8 Flash</span></div>
-                <div><span class="tc-lbl">Status:</span> <span class="mono bold text-primary" id="tel-status">Standby</span></div>
+                <div class="source-feed-row">
+                  <span class="badge badge-success mono-xs">200 OK</span>
+                  <div class="source-feed-info">
+                    <span class="source-feed-name">FDA MedWatch Safety Feed</span>
+                  </div>
+                  <span class="source-feed-time mono-xs" id="time-src-3">1m ago</span>
+                  <span class="source-feed-delta zero mono-xs">0 new</span>
+                </div>
+                <div class="source-feed-row">
+                  <span class="badge badge-success mono-xs">200 OK</span>
+                  <div class="source-feed-info">
+                    <span class="source-feed-name">EudraVigilance Gateway</span>
+                  </div>
+                  <span class="source-feed-time mono-xs" id="time-src-4">2m ago</span>
+                  <span class="source-feed-delta zero mono-xs">0 new</span>
+                </div>
+                <div class="source-feed-row">
+                  <span class="badge badge-success mono-xs">200 OK</span>
+                  <div class="source-feed-info">
+                    <span class="source-feed-name">WHO Global Alert Feed</span>
+                  </div>
+                  <span class="source-feed-time mono-xs" id="time-src-5">4m ago</span>
+                  <span class="source-feed-delta zero mono-xs">0 new</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Real-Time Bulletin Feed Stream -->
+        <!-- Right Column: Real-Time Findings & Bulletins (Expandable cards) -->
         <div class="card">
           <div class="card-header">
-            <h3>Real-Time Bulletin Feed Stream</h3>
-            <span class="header-note" id="feed-count">3 bulletins indexed</span>
+            <h3>Regulatory Findings &amp; Real-Time Bulletins</h3>
+            <span class="header-note" id="feed-count">3 bulletins indexed · Click card to expand</span>
           </div>
           <div class="card-body feed-card-body">
             <div class="bulletin-feed-list" id="bulletin-feed-list">
-              <!-- Class 1 Item -->
-              <div class="feed-item item-class1" id="feed-item-amimox">
-                <div class="feed-item-header">
-                  <span class="badge badge-danger">CLASS I: CRITICAL</span>
-                  <span class="feed-time">2 mins ago</span>
+              
+              <!-- Finding 1: Class 1 Amimox -->
+              <div class="finding-card item-class1" id="feed-item-amimox">
+                <div class="finding-card-summary" role="button" tabindex="0">
+                  <div class="finding-top-row">
+                    <span class="badge badge-danger">CLASS I: CRITICAL</span>
+                    <span class="finding-source-tag">Läkemedelsverket · Ref LV-2026-0912</span>
+                    <span class="finding-time">2 mins ago</span>
+                  </div>
+                  <h4 class="finding-title">Amimox (Amoxicillin 500 mg) — Oral Suspension</h4>
+                  <p class="finding-desc">Microscopic synthetic polymer and particulate precipitation in oral suspension capsules.</p>
+                  <div class="finding-expand-cue">
+                    <span class="cue-label">Batch Details &amp; Quarantine Action</span>
+                    <span class="cue-icon">▾</span>
+                  </div>
                 </div>
-                <h4 class="feed-title">Amimox (Amoxicillin 500 mg) — Läkemedelsverket</h4>
-                <div class="feed-meta-row">
-                  <span><strong>GTIN:</strong> <span class="mono">07350012345678</span></span>
-                  <span><strong>Lots:</strong> <span class="mono text-crimson bold">L9824B, L9824C</span></span>
-                  <span><strong>ATC:</strong> <span class="mono">J01CA04</span></span>
-                </div>
-                <p class="feed-defect"><strong>Defect:</strong> Particulate precipitation of synthetic microscopic polymer and metallic fragments in capsules. Severe acute mucosal threat.</p>
-                <div class="feed-footer">
-                  <span class="feed-status-tag" id="feed-amimox-status">PROCESSED IN 1.18s</span>
-                  <button class="btn btn-xs btn-primary" id="btn-view-action-1">View Action ──►</button>
-                </div>
-              </div>
-
-              <!-- Class 2 Item -->
-              <div class="feed-item item-class2">
-                <div class="feed-item-header">
-                  <span class="badge badge-warning">CLASS II: DEFECT</span>
-                  <span class="feed-time">3 hours ago</span>
-                </div>
-                <h4 class="feed-title">Omeprazol 20 mg enterokapslar — Sandoz AB</h4>
-                <div class="feed-meta-row">
-                  <span><strong>GTIN:</strong> <span class="mono">07350044556677</span></span>
-                  <span><strong>Lot:</strong> <span class="mono">K1092A</span></span>
-                  <span><strong>ATC:</strong> <span class="mono">A02BC01</span></span>
-                </div>
-                <p class="feed-defect"><strong>Defect:</strong> Dissolution delay at pH 6.8 exceeding monograph specifications by 12% in accelerated 6-month stability study.</p>
-                <div class="feed-footer">
-                  <span class="feed-status-tag">BATCH RECALLED · ALTERNATIVE STOCKED</span>
-                  <span class="feed-action-note">Restocked via AstraZeneca</span>
+                <div class="finding-card-details">
+                  <div class="finding-details-inner">
+                    <div class="details-grid">
+                      <div><span class="dt-lbl">GTIN / Barcode:</span> <span class="mono bold">07350012345678</span></div>
+                      <div><span class="dt-lbl">Quarantined Lots:</span> <span class="mono bold text-crimson">L9824B, L9824C</span></div>
+                      <div><span class="dt-lbl">ATC Classification:</span> <span class="mono">J01CA04 (Antibacterials)</span></div>
+                      <div><span class="dt-lbl">Risk Tier:</span> <span class="mono text-crimson bold">Severe Acute Mucosal Threat</span></div>
+                    </div>
+                    <div class="details-defect-box">
+                      <strong>Immediate Defect Assessment:</strong>
+                      <p>Particulate precipitation of synthetic microscopic polymer and metallic fragments in capsules. Severe acute mucosal threat requiring immediate register lockout across all clinical and retail dispensing points.</p>
+                    </div>
+                    <div class="details-footer">
+                      <span class="feed-status-tag" id="feed-amimox-status">PROCESSED IN 1.18s</span>
+                      <button class="btn btn-xs btn-primary" id="btn-view-action-1">View Kill-Switch Status ──►</button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <!-- Class 3 Item -->
-              <div class="feed-item item-class3" id="feed-item-alvedon">
-                <div class="feed-item-header">
-                  <span class="badge badge-info">CLASS III: MINOR</span>
-                  <span class="feed-time">Yesterday</span>
+              <!-- Finding 2: Class 2 Omeprazol -->
+              <div class="finding-card item-class2" id="feed-item-omeprazol">
+                <div class="finding-card-summary" role="button" tabindex="0">
+                  <div class="finding-top-row">
+                    <span class="badge badge-warning">CLASS II: DEFECT</span>
+                    <span class="finding-source-tag">EMA Rapid Alert · Ref EU/1/98/082</span>
+                    <span class="finding-time">3 hours ago</span>
+                  </div>
+                  <h4 class="finding-title">Omeprazol 20 mg enterokapslar — Sandoz AB</h4>
+                  <p class="finding-desc">Dissolution delay at pH 6.8 exceeding monograph specifications by 12% in accelerated study.</p>
+                  <div class="finding-expand-cue">
+                    <span class="cue-label">Batch Details &amp; Quarantine Action</span>
+                    <span class="cue-icon">▾</span>
+                  </div>
                 </div>
-                <h4 class="feed-title">Alvedon 500 mg filmdragerade — Haleon Sweden AB</h4>
-                <div class="feed-meta-row">
-                  <span><strong>GTIN:</strong> <span class="mono">07350099999999</span></span>
-                  <span><strong>Lot:</strong> <span class="mono">P4401Z</span></span>
-                  <span><strong>ATC:</strong> <span class="mono">N02BE01</span></span>
-                </div>
-                <p class="feed-defect"><strong>Defect:</strong> Secondary carton flap typography misprint (PIL date revision reads 02/2026 instead of 03/2026). Chemical purity 100% compliant.</p>
-                <div class="feed-footer">
-                  <span class="feed-status-tag text-muted">AUDIT NOTE LOGGED · DISPENSING NOMINAL</span>
-                  <span class="feed-action-note">No Lockout Engaged</span>
+                <div class="finding-card-details">
+                  <div class="finding-details-inner">
+                    <div class="details-grid">
+                      <div><span class="dt-lbl">GTIN / Barcode:</span> <span class="mono bold">07350044556677</span></div>
+                      <div><span class="dt-lbl">Impacted Lot:</span> <span class="mono bold text-warning">K1092A</span></div>
+                      <div><span class="dt-lbl">ATC Classification:</span> <span class="mono">A02BC01 (PPI)</span></div>
+                      <div><span class="dt-lbl">Risk Tier:</span> <span class="mono text-warning bold">Reduced Bioavailability</span></div>
+                    </div>
+                    <div class="details-defect-box">
+                      <strong>Stability Defect Assessment:</strong>
+                      <p>Dissolution delay at pH 6.8 exceeding monograph specifications by 12% in accelerated 6-month stability study. Restocked via AstraZeneca clinical stock.</p>
+                    </div>
+                    <div class="details-footer">
+                      <span class="feed-status-tag text-warning">BATCH RECALLED · ALTERNATIVE STOCKED</span>
+                      <span class="feed-action-note">Restocked via AstraZeneca</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              <!-- Finding 3: Class 3 Alvedon -->
+              <div class="finding-card item-class3" id="feed-item-alvedon">
+                <div class="finding-card-summary" role="button" tabindex="0">
+                  <div class="finding-top-row">
+                    <span class="badge badge-info">CLASS III: MINOR</span>
+                    <span class="finding-source-tag">Haleon Sweden AB · Läkemedelsverket</span>
+                    <span class="finding-time">Yesterday</span>
+                  </div>
+                  <h4 class="finding-title">Alvedon 500 mg filmdragerade — Paracetamol</h4>
+                  <p class="finding-desc">Secondary carton flap typography misprint (PIL date revision reads 02/2026 instead of 03/2026).</p>
+                  <div class="finding-expand-cue">
+                    <span class="cue-label">Batch Details &amp; Audit Log</span>
+                    <span class="cue-icon">▾</span>
+                  </div>
+                </div>
+                <div class="finding-card-details">
+                  <div class="finding-details-inner">
+                    <div class="details-grid">
+                      <div><span class="dt-lbl">GTIN / Barcode:</span> <span class="mono bold">07350099999999</span></div>
+                      <div><span class="dt-lbl">Impacted Lot:</span> <span class="mono bold">P4401Z</span></div>
+                      <div><span class="dt-lbl">ATC Classification:</span> <span class="mono">N02BE01 (Analgesics)</span></div>
+                      <div><span class="dt-lbl">Risk Tier:</span> <span class="mono text-muted bold">Nil Clinical Threat</span></div>
+                    </div>
+                    <div class="details-defect-box">
+                      <strong>Packaging Defect Assessment:</strong>
+                      <p>Secondary carton flap typography misprint (PIL date revision reads 02/2026 instead of 03/2026). Chemical purity 100% compliant. Autonomous audit note logged; no register lockout engaged.</p>
+                    </div>
+                    <div class="details-footer">
+                      <span class="feed-status-tag text-muted">AUDIT NOTE LOGGED · DISPENSING NOMINAL</span>
+                      <span class="feed-action-note">No Lockout Engaged</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Live Agent Trace Console (Step 1 Integration) -->
-      <div class="card trace-card-container">
-        <div class="card-header">
+      <!-- Collapsible Autonomous Agent Real-Time Decision Stream -->
+      <div class="card trace-card-container" id="trace-card-container">
+        <div class="card-header collapsible-header" id="trace-toggle-header" role="button" tabindex="0" title="Click to collapse / expand decision stream">
           <div class="trace-header-left">
             <span class="pulse-dot-sm"></span>
             <h3>Autonomous Agent Real-Time Decision Stream</h3>
+            <span class="trace-badge-hint mono-xs">Gemini 3.8 Flash</span>
           </div>
-          <span class="trace-status-chip" id="step1-trace-status">Standby</span>
+          <div class="trace-header-right">
+            <span class="trace-status-chip" id="step1-trace-status">Standby</span>
+            <button class="btn btn-xs btn-outline btn-collapse-toggle" id="btn-toggle-trace" aria-expanded="true">
+              <span id="trace-toggle-icon">▲</span> <span id="trace-toggle-text">Collapse Stream</span>
+            </button>
+          </div>
         </div>
-        <div class="trace-console" id="trace-console-stream">
-          <div class="trace-empty-state">
-            <span>⚡ Click "Simulate Class 1 Recall" above to observe Gemini's tool-calling sequence in real time.</span>
+        <div class="trace-collapsible-wrapper" id="trace-collapsible-wrapper">
+          <div class="trace-console" id="trace-console-stream">
+            <div class="trace-empty-state">
+              <span>⚡ Click "Simulate Class 1 Recall" or drop a bulletin file above to observe Gemini's tool-calling sequence in real time.</span>
+            </div>
           </div>
         </div>
       </div>
@@ -836,6 +974,155 @@
 
       <div class="lockout-actions">
         <button class="btn btn-acknowledge" id="btn-close-modal">Acknowledge & Confiscate Package</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Configured Regulatory Sources & Web Scrapers -->
+  <div class="settings-backdrop hidden" id="sources-modal-backdrop">
+    <div class="settings-drawer sources-modal-drawer">
+      <div class="drawer-header">
+        <div class="brand">
+          <span class="brand-shield">📡</span>
+          <div class="brand-text">
+            <span class="brand-title">Monitored Regulatory Sources &amp; Web Scrapers</span>
+            <span class="brand-sub">Autonomous surveillance engine checking official feeds every 30–180s</span>
+          </div>
+        </div>
+        <button class="btn-drawer-close" id="btn-close-sources">✕</button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="sources-modal-list">
+          <!-- Source 1 -->
+          <div class="source-modal-item">
+            <div class="smi-header">
+              <div class="smi-title-wrap">
+                <span class="smi-flag">🇸🇪</span>
+                <strong class="smi-name">Läkemedelsverket (Swedish MPA)</strong>
+              </div>
+              <span class="badge badge-success">● ACTIVE (200 OK)</span>
+            </div>
+            <div class="smi-meta">
+              <a href="https://www.lakemedelsverket.se/sv/nyheter-och-press/aterkallanden" target="_blank" rel="noopener noreferrer" class="smi-url mono">https://www.lakemedelsverket.se/sv/nyheter-och-press/aterkallanden ↗</a>
+              <div class="smi-tags">
+                <span class="smi-tag">Type: RSS / Web Scraper</span>
+                <span class="smi-tag">Interval: 30s</span>
+                <span class="smi-tag" id="smi-polled-1">Last Polled: 12s ago</span>
+              </div>
+            </div>
+            <button class="btn btn-xs btn-outline btn-ping-source" data-src="Läkemedelsverket">⚡ Scrape Now (Ping)</button>
+          </div>
+
+          <!-- Source 2 -->
+          <div class="source-modal-item">
+            <div class="smi-header">
+              <div class="smi-title-wrap">
+                <span class="smi-flag">🇪🇺</span>
+                <strong class="smi-name">EMA Rapid Alert System (EU)</strong>
+              </div>
+              <span class="badge badge-success">● ACTIVE (200 OK)</span>
+            </div>
+            <div class="smi-meta">
+              <a href="https://www.ema.europa.eu/en/human-regulatory/post-authorisation/pharmacovigilance/recalls" target="_blank" rel="noopener noreferrer" class="smi-url mono">https://www.ema.europa.eu/en/human-regulatory/recalls ↗</a>
+              <div class="smi-tags">
+                <span class="smi-tag">Type: Atom Feed / XML</span>
+                <span class="smi-tag">Interval: 60s</span>
+                <span class="smi-tag" id="smi-polled-2">Last Polled: 42s ago</span>
+              </div>
+            </div>
+            <button class="btn btn-xs btn-outline btn-ping-source" data-src="EMA Rapid Alert">⚡ Scrape Now (Ping)</button>
+          </div>
+
+          <!-- Source 3 -->
+          <div class="source-modal-item">
+            <div class="smi-header">
+              <div class="smi-title-wrap">
+                <span class="smi-flag">🇺🇸</span>
+                <strong class="smi-name">FDA MedWatch Safety Enforcements (US)</strong>
+              </div>
+              <span class="badge badge-success">● ACTIVE (200 OK)</span>
+            </div>
+            <div class="smi-meta">
+              <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" target="_blank" rel="noopener noreferrer" class="smi-url mono">https://www.fda.gov/safety/recalls-safety-alerts ↗</a>
+              <div class="smi-tags">
+                <span class="smi-tag">Type: REST API / Webhook</span>
+                <span class="smi-tag">Interval: 120s</span>
+                <span class="smi-tag" id="smi-polled-3">Last Polled: 1m ago</span>
+              </div>
+            </div>
+            <button class="btn btn-xs btn-outline btn-ping-source" data-src="FDA MedWatch">⚡ Scrape Now (Ping)</button>
+          </div>
+
+          <!-- Source 4 -->
+          <div class="source-modal-item">
+            <div class="smi-header">
+              <div class="smi-title-wrap">
+                <span class="smi-flag">🇪🇺</span>
+                <strong class="smi-name">EudraVigilance Gateway</strong>
+              </div>
+              <span class="badge badge-success">● ACTIVE (200 OK)</span>
+            </div>
+            <div class="smi-meta">
+              <a href="https://www.eudravigilance.ema.europa.eu/" target="_blank" rel="noopener noreferrer" class="smi-url mono">https://www.eudravigilance.ema.europa.eu/ ↗</a>
+              <div class="smi-tags">
+                <span class="smi-tag">Type: EDI Direct Gateway</span>
+                <span class="smi-tag">Interval: 180s</span>
+                <span class="smi-tag" id="smi-polled-4">Last Polled: 2m ago</span>
+              </div>
+            </div>
+            <button class="btn btn-xs btn-outline btn-ping-source" data-src="EudraVigilance">⚡ Scrape Now (Ping)</button>
+          </div>
+
+          <!-- Source 5 -->
+          <div class="source-modal-item">
+            <div class="smi-header">
+              <div class="smi-title-wrap">
+                <span class="smi-flag">🌐</span>
+                <strong class="smi-name">WHO Global Medical Product Alerts</strong>
+              </div>
+              <span class="badge badge-success">● ACTIVE (200 OK)</span>
+            </div>
+            <div class="smi-meta">
+              <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" class="smi-url mono">https://www.who.int/emergencies/disease-outbreak-news ↗</a>
+              <div class="smi-tags">
+                <span class="smi-tag">Type: Headless Web Scraper</span>
+                <span class="smi-tag">Interval: 300s</span>
+                <span class="smi-tag" id="smi-polled-5">Last Polled: 4m ago</span>
+              </div>
+            </div>
+            <button class="btn btn-xs btn-outline btn-ping-source" data-src="WHO Alert">⚡ Scrape Now (Ping)</button>
+          </div>
+
+          <!-- Source 6 -->
+          <div class="source-modal-item">
+            <div class="smi-header">
+              <div class="smi-title-wrap">
+                <span class="smi-flag">🇮🇪</span>
+                <strong class="smi-name">HPRA Ireland Drug Safety</strong>
+              </div>
+              <span class="badge badge-success">● ACTIVE (200 OK)</span>
+            </div>
+            <div class="smi-meta">
+              <a href="https://www.hpra.ie/homepage/medicines/safety-information" target="_blank" rel="noopener noreferrer" class="smi-url mono">https://www.hpra.ie/homepage/medicines/safety-information ↗</a>
+              <div class="smi-tags">
+                <span class="smi-tag">Type: RSS Poller</span>
+                <span class="smi-tag">Interval: 300s</span>
+                <span class="smi-tag" id="smi-polled-6">Last Polled: 5m ago</span>
+              </div>
+            </div>
+            <button class="btn btn-xs btn-outline btn-ping-source" data-src="HPRA Ireland">⚡ Scrape Now (Ping)</button>
+          </div>
+        </div>
+
+        <div class="add-source-section">
+          <span class="lbl-caps">+ Register New Regulatory Scraper / RSS Target:</span>
+          <div class="add-source-form">
+            <input type="text" class="input-text" id="new-source-name" placeholder="Authority name (e.g. ANSM France)">
+            <input type="url" class="input-text" id="new-source-url" placeholder="https://example.gov/recalls/feed.xml">
+            <button class="btn btn-primary" id="btn-save-new-source">+ Add Scraper Target</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

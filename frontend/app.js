@@ -130,6 +130,138 @@ settingsBackdrop.addEventListener('click', (e) => {
   }
 });
 
+// --- Monitored Regulatory Sources Modal Drawer ---
+const btnShowSources = document.getElementById('btn-show-sources');
+const sourcesModalBackdrop = document.getElementById('sources-modal-backdrop');
+const btnCloseSources = document.getElementById('btn-close-sources');
+
+if (btnShowSources && sourcesModalBackdrop) {
+  btnShowSources.addEventListener('click', () => {
+    initAudio();
+    sourcesModalBackdrop.classList.remove('hidden');
+  });
+}
+
+if (btnCloseSources && sourcesModalBackdrop) {
+  btnCloseSources.addEventListener('click', () => {
+    sourcesModalBackdrop.classList.add('hidden');
+  });
+}
+
+if (sourcesModalBackdrop) {
+  sourcesModalBackdrop.addEventListener('click', (e) => {
+    if (e.target === sourcesModalBackdrop) {
+      sourcesModalBackdrop.classList.add('hidden');
+    }
+  });
+}
+
+// Global ESC key to close any active modal drawer
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (sourcesModalBackdrop) sourcesModalBackdrop.classList.add('hidden');
+    if (settingsBackdrop) settingsBackdrop.classList.add('hidden');
+  }
+});
+
+// Ping source triggers in modal
+document.querySelectorAll('.btn-ping-source').forEach(btn => {
+  btn.addEventListener('click', () => {
+    initAudio();
+    playScanChime();
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<span>⚡ Polling...</span>';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      btn.innerHTML = '<span>✓ Polled (200 OK)</span>';
+      const pollTimer = document.getElementById('sources-poll-timer');
+      if (pollTimer) pollTimer.textContent = 'Polled just now';
+      const time1 = document.getElementById('time-src-1');
+      if (time1) time1.textContent = 'Just now';
+
+      setTimeout(() => {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+      }, 1200);
+    }, 450);
+  });
+});
+
+// Add custom source target form
+const btnSaveNewSource = document.getElementById('btn-save-new-source');
+const newSourceName = document.getElementById('new-source-name');
+const newSourceUrl = document.getElementById('new-source-url');
+const sourcesModalList = document.querySelector('.sources-modal-list');
+const sourcesCheckedFeed = document.getElementById('sources-checked-feed');
+
+if (btnSaveNewSource && newSourceName && newSourceUrl) {
+  btnSaveNewSource.addEventListener('click', () => {
+    const name = newSourceName.value.trim();
+    const url = newSourceUrl.value.trim();
+    if (!name || !url) {
+      alert('Please provide authority name and URL.');
+      return;
+    }
+    initAudio();
+    playScanChime();
+
+    // Append to modal
+    const item = document.createElement('div');
+    item.className = 'source-modal-item';
+    item.innerHTML = `
+      <div class="smi-header">
+        <div class="smi-title-wrap">
+          <span class="smi-flag">🌐</span>
+          <strong class="smi-name">${escapeHtml(name)}</strong>
+        </div>
+        <span class="badge badge-success">● ACTIVE (200 OK)</span>
+      </div>
+      <div class="smi-meta">
+        <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="smi-url mono">${escapeHtml(url)} ↗</a>
+        <div class="smi-tags">
+          <span class="smi-tag">Type: Custom Poller</span>
+          <span class="smi-tag">Interval: 60s</span>
+          <span class="smi-tag">Last Polled: Just added</span>
+        </div>
+      </div>
+      <button class="btn btn-xs btn-outline btn-ping-source" data-src="${escapeHtml(name)}">⚡ Scrape Now (Ping)</button>
+    `;
+    sourcesModalList.appendChild(item);
+
+    // Rebind ping button on new element
+    item.querySelector('.btn-ping-source').addEventListener('click', function() {
+      initAudio();
+      playScanChime();
+      this.innerHTML = '<span>⚡ Polling...</span>';
+      setTimeout(() => {
+        this.innerHTML = '<span>✓ Polled (200 OK)</span>';
+        setTimeout(() => { this.innerHTML = '⚡ Scrape Now (Ping)'; }, 1000);
+      }, 400);
+    });
+
+    // Append to checked feed
+    if (sourcesCheckedFeed) {
+      const feedRow = document.createElement('div');
+      feedRow.className = 'source-feed-row';
+      feedRow.innerHTML = `
+        <span class="badge badge-success mono-xs">200 OK</span>
+        <div class="source-feed-info">
+          <span class="source-feed-name">${escapeHtml(name)}</span>
+        </div>
+        <span class="source-feed-time mono-xs">Just now</span>
+        <span class="source-feed-delta zero mono-xs">0 new</span>
+      `;
+      sourcesCheckedFeed.prepend(feedRow);
+    }
+
+    newSourceName.value = '';
+    newSourceUrl.value = '';
+    btnSaveNewSource.textContent = '✓ Added!';
+    setTimeout(() => { btnSaveNewSource.textContent = '+ Add Scraper Target'; }, 1000);
+  });
+}
+
 // --- Sound Toggle ---
 const btnSound = document.getElementById('btn-sound');
 const soundIcon = document.getElementById('sound-icon');
@@ -167,6 +299,240 @@ const stepTab2 = document.getElementById('step-tab-2');
 const stepTab3 = document.getElementById('step-tab-3');
 const stepTab4 = document.getElementById('step-tab-4');
 
+// Collapsible Decision Stream Elements
+const traceCardContainer = document.getElementById('trace-card-container');
+const traceToggleHeader = document.getElementById('trace-toggle-header');
+const btnToggleTrace = document.getElementById('btn-toggle-trace');
+const traceToggleIcon = document.getElementById('trace-toggle-icon');
+const traceToggleText = document.getElementById('trace-toggle-text');
+
+function toggleTraceCollapse(forceState) {
+  if (!traceCardContainer) return;
+  const shouldCollapse = forceState !== undefined ? forceState : !traceCardContainer.classList.contains('collapsed');
+  traceCardContainer.classList.toggle('collapsed', shouldCollapse);
+  if (btnToggleTrace) {
+    btnToggleTrace.setAttribute('aria-expanded', !shouldCollapse);
+  }
+  if (traceToggleIcon) {
+    traceToggleIcon.textContent = shouldCollapse ? '▼' : '▲';
+  }
+  if (traceToggleText) {
+    traceToggleText.textContent = shouldCollapse ? 'Expand Stream' : 'Collapse Stream';
+  }
+}
+
+if (traceToggleHeader) {
+  traceToggleHeader.addEventListener('click', (e) => {
+    if (e.target.closest('#btn-toggle-trace')) return;
+    toggleTraceCollapse();
+  });
+}
+
+if (btnToggleTrace) {
+  btnToggleTrace.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleTraceCollapse();
+  });
+}
+
+// Expandable Finding Cards Setup
+function setupExpandableFindingCards() {
+  const cards = document.querySelectorAll('.finding-card');
+  cards.forEach(card => {
+    const summary = card.querySelector('.finding-card-summary');
+    const cueLabel = card.querySelector('.cue-label');
+    if (!summary) return;
+
+    summary.addEventListener('click', () => {
+      initAudio();
+      const isExpanded = card.classList.toggle('expanded');
+      if (cueLabel) {
+        cueLabel.textContent = isExpanded ? 'Hide Details & Collapse' : 'Batch Details & Quarantine Action';
+      }
+    });
+
+    summary.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        summary.click();
+      }
+    });
+  });
+
+  // Action buttons inside expanded cards that link to Step 2
+  document.querySelectorAll('.btn-goto-action').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goToStep(2);
+    });
+  });
+}
+
+setupExpandableFindingCards();
+
+// Dropzone & File Picker Elements
+const dropzoneBox = document.getElementById('dropzone-box');
+const bulletinFileInput = document.getElementById('bulletin-file-input');
+const dropzoneDefaultView = document.getElementById('dropzone-default-view');
+const dropzonePreviewView = document.getElementById('dropzone-preview-view');
+const dfpFilename = document.getElementById('dfp-filename');
+const dfpSize = document.getElementById('dfp-size');
+const btnClearFile = document.getElementById('btn-clear-file');
+const btnRunDropped = document.getElementById('btn-run-dropped');
+
+let stagedFileText = null;
+let stagedFileName = '';
+
+function setupDropzoneAndIngestion() {
+  if (!dropzoneBox || !bulletinFileInput) return;
+
+  // Click on dropzone triggers file picker
+  dropzoneBox.addEventListener('click', (e) => {
+    if (e.target.closest('#btn-clear-file') || e.target.closest('#btn-run-dropped')) return;
+    initAudio();
+    bulletinFileInput.click();
+  });
+
+  // File input change
+  bulletinFileInput.addEventListener('change', () => {
+    if (bulletinFileInput.files && bulletinFileInput.files.length > 0) {
+      handleFileSelected(bulletinFileInput.files[0]);
+    }
+  });
+
+  // Drag & drop listeners
+  ['dragenter', 'dragover'].forEach(evtName => {
+    dropzoneBox.addEventListener(evtName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzoneBox.classList.add('dragover');
+    });
+  });
+
+  ['dragleave', 'dragend'].forEach(evtName => {
+    dropzoneBox.addEventListener(evtName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropzoneBox.classList.remove('dragover');
+    });
+  });
+
+  dropzoneBox.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzoneBox.classList.remove('dragover');
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      handleFileSelected(dt.files[0]);
+    }
+  });
+
+  if (btnClearFile) {
+    btnClearFile.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearStagedFile();
+    });
+  }
+
+  if (btnRunDropped) {
+    btnRunDropped.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (stagedFileText) {
+        ingestCustomBulletinStream(stagedFileText, stagedFileName);
+      }
+    });
+  }
+}
+
+function handleFileSelected(file) {
+  initAudio();
+  playScanChime();
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    stagedFileText = e.target.result;
+    stagedFileName = file.name;
+
+    if (dfpFilename) dfpFilename.textContent = file.name;
+    if (dfpSize) dfpSize.textContent = `(${(file.size / 1024).toFixed(1)} KB)`;
+    if (dropzoneDefaultView) dropzoneDefaultView.classList.add('hidden');
+    if (dropzonePreviewView) dropzonePreviewView.classList.remove('hidden');
+
+    // Automatically trigger Gemini agent parser stream
+    ingestCustomBulletinStream(stagedFileText, stagedFileName);
+  };
+  reader.readAsText(file);
+}
+
+function clearStagedFile() {
+  stagedFileText = null;
+  stagedFileName = '';
+  if (bulletinFileInput) bulletinFileInput.value = '';
+  if (dropzonePreviewView) dropzonePreviewView.classList.add('hidden');
+  if (dropzoneDefaultView) dropzoneDefaultView.classList.remove('hidden');
+}
+
+setupDropzoneAndIngestion();
+
+// Custom Bulletin File Ingestion via POST /api/bulletin/ingest SSE Stream
+async function ingestCustomBulletinStream(rawText, filename = 'uploaded_bulletin') {
+  initAudio();
+  if (activeEventSource) {
+    activeEventSource.close();
+    activeEventSource = null;
+  }
+  btnSimClass1.disabled = true;
+  btnSimClass3.disabled = true;
+  if (btnRunDropped) btnRunDropped.disabled = true;
+
+  telStatus.textContent = 'Parsing File...';
+  step1TraceStatus.textContent = `Processing ${filename}...`;
+  traceConsoleStream.innerHTML = '';
+  toggleTraceCollapse(false); // auto-expand stream
+
+  const t0 = performance.now();
+  try {
+    const resp = await fetch('/api/bulletin/ingest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: rawText })
+    });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`Server returned ${resp.status}: ${errText}`);
+    }
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const blocks = buffer.split('\n\n');
+      buffer = blocks.pop(); // keep residual partial chunk
+      for (const block of blocks) {
+        for (const line of block.split('\n')) {
+          if (line.startsWith('data: ')) {
+            try {
+              const ev = JSON.parse(line.substring(6));
+              handleAgentStepEvent(ev, filename);
+            } catch (err) {
+              console.warn('Failed to parse SSE JSON line:', line, err);
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('File ingest error:', err);
+    appendTraceRow('ERROR', err.message, `${Math.round(performance.now() - t0)}ms`, 't-lockout');
+  } finally {
+    btnSimClass1.disabled = false;
+    btnSimClass3.disabled = false;
+    if (btnRunDropped) btnRunDropped.disabled = false;
+  }
+}
+
 let activeEventSource = null;
 
 function triggerSimulation(type) {
@@ -175,6 +541,9 @@ function triggerSimulation(type) {
   if (activeEventSource) {
     activeEventSource.close();
   }
+
+  // Ensure trace stream is open so user sees tool calls
+  toggleTraceCollapse(false);
 
   btnSimClass1.disabled = true;
   btnSimClass3.disabled = true;
@@ -512,6 +881,8 @@ btnReset.addEventListener('click', async () => {
       stepStatus4.textContent = 'Standby';
 
       // Reset Step 1
+      clearStagedFile();
+      if (sourcesModalBackdrop) sourcesModalBackdrop.classList.add('hidden');
       telStatus.textContent = 'Standby';
       telLatency.textContent = '120ms';
       step1TraceStatus.textContent = 'Standby';
