@@ -1,0 +1,34 @@
+LÄKEMEDELSVERKET / SWEDISH MEDICAL PRODUCTS AGENCY
+ENHETEN FÖR TILLSYN OCH SÄKERHET - URGENT SAFETY DIRECTIVE
+
+REFERENSNUMMER: LV-2026-0912
+DATUM: 2026-10-03
+ALLVARLIGHETSGRAD: KLASS 1 - AKUT INDRAGNING (CLASS I CRITICAL DEFECT)
+HANDLÄGGARE: Avdelningen för Läkemedelssäkerhet, Uppsala
+
+BERÖRD PRODUKT:
+Handelsnamn: Amimox 500 mg hårda kapslar
+Aktiv substans: Amoxicillin (trihydrat)
+ATC-kod: J01CA04
+GTIN-kod: 07350012345678
+Varunummer (Vnr): 123456
+Marknadsgodkännande (MTnr): 14289
+Tillverkare / Ombud: Meda / Viatris AB, Stockholm
+
+BERÖRDA BATCHER / LOT-NUMMER:
+Följande specifika tillverkningssatser omfattas av denna indragning:
+- Batch / Lot: L9824B (Utgångsdatum: 2026-11)
+- Batch / Lot: L9824C (Utgångsdatum: 2026-11)
+
+Anmärkning: Batch L1100A (Utgångsdatum: 2027-08) och övriga batcher har genomgått oberoende validering och är INTE kontaminerade. De förblir säkra och godkända för expediering.
+
+DEFEKTBESKRIVNING OCH HÄLSORISK:
+Vid kontinuerlig kvalitetskontroll och accelererad stabilitetstestning har utfällning av syntetiska mikroskopiska partiklar (polymera fällningar och metalliska spår) identifierats i kapselinnehållet för batch L9824B och L9824C. Oral administrering medför omedelbar risk för allvarlig akut mukosal irritation, systemisk toxisk reaktion samt potentiell mikroembolisering hos immunsupprimerade patienter. 
+
+Defekten bedöms utgöra en direkt och överhängande fara för patienters liv och hälsa (Klass 1).
+
+FÖRESKRIFT OCH ÅTGÄRD:
+1. SJUKHUS OCH APOTEK: Omedelbart stopp för all försäljning och utlämning av berörda batcher (L9824B, L9824C).
+2. KONTROLL VID KASSA: Fysiska och elektroniska spärrar skall omedelbart aktiveras i samtliga apoteksterminaler.
+3. KARANTÄN: Kvarvarande förpackningar skall avskiljas och förvaras i röd säkerhetsbehållare för farligt avfall i avvaktan på destruktion.
+4. GROSSISTER (Tamro, Oriola): Spärra omgående lagerutleveranser för berörda satser.

@@ -1,0 +1,52 @@
+{
+  "mappings": {
+    "J01CA04": {
+      "substance": "Amoxicillin",
+      "therapeutic_group": "J01CA (Penicillins with extended spectrum)",
+      "alternatives": [
+        {
+          "atc_code": "J01CR02",
+          "substance": "Amoxicillin and beta-lactamase inhibitor",
+          "brand_name": "Spektramox 500mg/125mg",
+          "equivalence_level": "Level 4 Pharmacological Bioequivalent",
+          "supplier_id": "SUPP-TAMRO-SE",
+          "supplier_name": "Tamro AB Sweden",
+          "supplier_sku": "TAMRO-98311-SE",
+          "delivery_sla_hours": 12,
+          "unit_price_sek": 25.00,
+          "clinical_notes": "First-line oral equivalent for systemic respiratory/ENT infections when plain amoxicillin is quarantined."
+        },
+        {
+          "atc_code": "J01CA04",
+          "substance": "Amoxicillin 500mg",
+          "brand_name": "Amoxicillin Sandoz 500mg",
+          "equivalence_level": "Level 5 Direct Generic Equivalent",
+          "supplier_id": "SUPP-TAMRO-SE",
+          "supplier_name": "Tamro AB Sweden",
+          "supplier_sku": "TAMRO-44102-SE",
+          "delivery_sla_hours": 48,
+          "unit_price_sek": 21.50,
+          "clinical_notes": "Direct generic substitute, but regional distributor warehouse currently holds only 120 units."
+        }
+      ]
+    },
+    "N02BE01": {
+      "substance": "Paracetamol",
+      "therapeutic_group": "N02BE (Anilides)",
+      "alternatives": [
+        {
+          "atc_code": "N02BE01",
+          "substance": "Paracetamol 500mg",
+          "brand_name": "Panodil 500mg",
+          "equivalence_level": "Level 5 Direct Generic Equivalent",
+          "supplier_id": "SUPP-TAMRO-SE",
+          "supplier_name": "Tamro AB Sweden",
+          "supplier_sku": "TAMRO-11200-SE",
+          "delivery_sla_hours": 24,
+          "unit_price_sek": 18.00,
+          "clinical_notes": "Generic equivalent for mild-to-moderate pain and antipyresis."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "bulletin_id": "LV-2026-0912",
+  "issuing_authority": "Läkemedelsverket",
+  "substance": "Amoxicillin",
+  "brand_name": "Amimox 500mg",
+  "atc_code": "J01CA04",
+  "gtin": "07350012345678",
+  "vnr": "123456",
+  "lot_numbers": ["L9824B", "L9824C"],
+  "expiry_dates": ["2026-11"],
+  "hazard_class": "CLASS_I",
+  "recall_reason": "Particulate precipitation of synthetic microscopic polymer and metal fragments causing acute toxic mucosa risk upon oral administration."
+}

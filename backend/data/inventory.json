@@ -1,0 +1,80 @@
+{
+  "hospital_nodes": [
+    {
+      "node_id": "HOSP-01-KAROLINSKA",
+      "name": "Karolinska University Hospital Solna",
+      "region": "Region Stockholm",
+      "inventory": [
+        {
+          "gtin": "07350012345678",
+          "substance": "Amoxicillin 500mg",
+          "brand_name": "Amimox 500mg",
+          "atc_code": "J01CA04",
+          "total_on_hand": 5200,
+          "daily_burn_rate": 400.0,
+          "initial_days_supply": 11.4,
+          "batches": [
+            {
+              "lot_number": "L1100A",
+              "expiry_date": "2027-08",
+              "units": 700,
+              "status": "SAFE"
+            },
+            {
+              "lot_number": "L9824B",
+              "expiry_date": "2026-11",
+              "units": 4500,
+              "status": "TARGET_RECALL"
+            }
+          ]
+        },
+        {
+          "gtin": "07350099999999",
+          "substance": "Paracetamol 500mg",
+          "brand_name": "Alvedon 500mg",
+          "atc_code": "N02BE01",
+          "total_on_hand": 8000,
+          "daily_burn_rate": 500.0,
+          "initial_days_supply": 16.0,
+          "batches": [
+            {
+              "lot_number": "P4401Z",
+              "expiry_date": "2028-02",
+              "units": 8000,
+              "status": "SAFE"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "distributors": [
+    {
+      "supplier_id": "SUPP-TAMRO-SE",
+      "name": "Tamro AB Sweden (Kungsängen Logistics Hub)",
+      "region": "Stockholm-Mälardalen",
+      "catalog": [
+        {
+          "atc_code": "J01CR02",
+          "substance": "Amoxicillin / Clavulanic Acid 500mg/125mg",
+          "brand_name": "Spektramox 500mg/125mg",
+          "gtin": "07350087654321",
+          "supplier_sku": "TAMRO-98311-SE",
+          "available_units": 18500,
+          "delivery_sla_hours": 12,
+          "unit_price_sek": 25.00
+        },
+        {
+          "atc_code": "J01CA04",
+          "substance": "Amoxicillin 500mg",
+          "brand_name": "Amoxicillin Sandoz 500mg",
+          "gtin": "07350055443322",
+          "supplier_sku": "TAMRO-44102-SE",
+          "available_units": 120,
+          "delivery_sla_hours": 48,
+          "unit_price_sek": 21.50
+        }
+      ]
+    }
+  ]
+}

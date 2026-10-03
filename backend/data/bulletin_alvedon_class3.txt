@@ -1,0 +1,30 @@
+LÄKEMEDELSVERKET / SWEDISH MEDICAL PRODUCTS AGENCY
+INFORMATIONSBULLETIN - KVALITETSNOTIS
+
+REFERENSNUMMER: LV-2026-0441
+DATUM: 2026-10-03
+ALLVARLIGHETSGRAD: KLASS 3 - MINDRE KVALITETSAVVIKELSE (CLASS III MINOR DEFECT)
+HANDLÄGGARE: Enheten för Tillsyn av Läkemedel och Medicinteknik
+
+BERÖRD PRODUKT:
+Handelsnamn: Alvedon 500 mg filmdragerade tabletter
+Aktiv substans: Paracetamol
+ATC-kod: N02BE01
+GTIN-kod: 07350099999999
+Varunummer (Vnr): 998877
+Tillverkare: Haleon Sweden AB
+
+BERÖRD BATCH / LOT-NUMMER:
+- Batch / Lot: P4401Z (Utgångsdatum: 2028-02)
+
+DEFEKTBESKRIVNING:
+Mindre typografiskt tryckfel på sekundärförpackningens innerflik (angivelse av datum för bipacksedelns senaste översyn visar felaktigt månadstryck). 
+Den kemiska sammansättningen, tablettens styrka, renhet och primära blisterförpackningens barriärintegritet är 100% felfria och uppfyller samtliga farmakopékrav. 
+
+HÄLSORISK OCH BEDÖMNING:
+Ingen risk föreligger för patientsäkerhet eller terapeutisk effekt. Avvikelsen klassificeras strikt som administrativ/kosmetisk kvalitetsavvikelse (Klass 3).
+
+FÖRESKRIFT OCH ÅTGÄRD:
+1. EXPEDIERING: Produkten förblir fullt godkänd för normal försäljning och utlämning på sjukhus och öppenvårdsapotek.
+2. SPÄRR: Fysiska terminaler eller försäljningssystem SKALL INTE spärras. Ingen karantän erfordras.
+3. LOGISTIK: Tillverkaren korrigerar tryckmallen inför kommande tillverkningssatser. Inventeringsnotis registreras vid nästa ordinarie kvartalsrevision.
