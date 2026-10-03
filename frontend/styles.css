@@ -1130,7 +1130,7 @@ body {
 }
 
 /* ==========================================================================
-   Step 2: Kill-Switch & Branch Topology Elements
+   Step 2: Distributed Edge Kill-Switch & Fleet Command Center Elements
    ========================================================================== */
 
 .containment-banner {
@@ -1163,191 +1163,442 @@ body {
   color: var(--text-light);
 }
 
-.topology-intro {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
+/* Command Strip: Active Edge Lockout Registry */
+.active-lockout-registry-card {
+  margin-bottom: 18px;
+  border-left: 4px solid var(--color-danger);
+  background: #FFF;
 }
 
-.topology-tree {
+.registry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #FAFAFA;
+}
+
+.reg-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reg-icon {
+  font-size: 20px;
+}
+
+.reg-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.registry-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.manual-lockout-bar {
+  background: #FEF2F2;
+  border: 1px solid var(--color-danger-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.mlb-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.mlb-form .input-text {
+  flex: 1;
+  min-width: 160px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.mlb-form .input-select {
+  padding: 6px 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  font-size: 12px;
+  background: #FFF;
+  min-width: 200px;
+}
+
+.active-locks-table-wrap {
+  overflow-x: auto;
+}
+
+.active-locks-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.active-locks-table th {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+}
+
+.active-locks-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+}
+
+.btn-release-lock {
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+.btn-release-lock:hover {
+  background: var(--color-danger-bg);
+}
+
+/* Left Panel: Connected Systems & Fleet Health */
+.fleet-health-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.fleet-header {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: #FFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 12px;
+  background: #FAFAFA;
 }
 
-.tree-node {
-  border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  padding: 8px 10px;
-  background: var(--bg-surface);
-}
-
-.tree-node-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
-.tree-toggle { font-size: 10px; color: var(--text-light); }
-.tree-icon { font-size: 14px; }
-.tree-name { font-weight: 600; flex: 1; }
-
-.tree-status-badge {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.status-open {
-  background: #F0FDF4;
-  border: 1px solid #BBF7D0;
-  color: #166534;
-}
-
-.status-locked {
-  background: var(--color-danger-bg);
-  border: 1px solid var(--color-danger-border);
-  color: var(--color-danger);
-  animation: pulse-red 1.5s infinite;
-}
-
-.tree-children {
-  margin-top: 6px;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tree-child-row {
+.fleet-filter-pills {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  flex-wrap: wrap;
 }
 
-.tree-branch { color: var(--border-focus); font-family: var(--font-mono); font-size: 10px; }
-.child-name { color: var(--text-muted); flex: 1; }
-.child-detail { font-family: var(--font-mono); font-size: 10px; color: var(--text-light); }
-.child-detail.locked { color: var(--color-danger); font-weight: 600; }
-
-.topology-footer {
-  border-top: 1px solid var(--border-subtle);
-  padding-top: 10px;
-  font-size: 11px;
-  color: var(--text-muted);
-  display: flex;
-  justify-content: space-between;
-}
-
-/* Scanner Simulator */
-.med-scanner-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.med-box {
-  background: var(--bg-surface);
+.fleet-tab {
+  background: #FFF;
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  padding: 10px;
-  position: relative;
-  overflow: hidden;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.med-box:hover {
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-sm);
+.fleet-tab:hover {
+  border-color: var(--border-medium);
+  color: var(--text-main);
 }
 
-.target-box { border-color: var(--border-medium); }
+.fleet-tab.active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #FFF;
+}
 
-.box-badge-row {
+.fleet-card-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fleet-node-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fleet-facility-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: #FFF;
+  overflow: hidden;
+}
+
+.ffc-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  padding: 8px 12px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.box-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-.box-meta { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; display: flex; flex-direction: column; }
-
-.mini-barcode {
-  height: 14px;
-  background: repeating-linear-gradient(90deg, #0F172A 0px, #0F172A 1px, transparent 1px, transparent 3px, #0F172A 3px, #0F172A 5px);
-  width: 80%;
-  margin-bottom: 8px;
+.ffc-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
 }
 
-.laser-line {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #EF4444;
-  box-shadow: 0 0 6px 2px #EF4444;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 10;
+.ffc-icon { font-size: 14px; }
+
+.ffc-nodes {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.laser-line.scanning {
-  opacity: 1;
-  animation: laser-sweep 0.22s ease-in-out;
+.fleet-node-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #FAFAFA;
+  border: 1px solid var(--border-subtle);
+  gap: 10px;
+  transition: all 0.15s ease;
 }
 
-@keyframes laser-sweep {
-  0% { top: 0%; opacity: 1; }
-  50% { top: 100%; opacity: 1; }
-  100% { top: 0%; opacity: 0; }
+.fleet-node-row:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-medium);
 }
 
-.lockout-hero-banner {
+.fleet-node-row.node-quarantined {
+  border-color: var(--color-danger-border);
+  background: var(--color-danger-bg);
+}
+
+.fnr-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fnr-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fnr-type-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.badge-pos { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.badge-wms { background: #F5F3FF; color: #6D28D9; border: 1px solid #DDD6FE; }
+
+.fnr-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.fnr-meta {
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge-erp-status {
+  background: #F1F5F9;
+  border: 1px solid var(--border-subtle);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.fleet-node-row.node-quarantined .badge-erp-status {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+.fnr-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fleet-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+
+/* Right Panel: ERP & POS Dispatch Command Center */
+.erp-control-card {
+  transition: all 0.25s ease;
+}
+
+.erp-control-card.flash-alert {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  animation: card-alert-flash 0.8s ease-in-out;
+}
+
+@keyframes card-alert-flash {
+  0%, 100% { border-color: #EF4444; }
+  50% { border-color: #DC2626; box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.3); }
+}
+
+.erp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAFAFA;
+}
+
+.terminal-selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminal-select-sm {
+  font-size: 11px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  background: #FFF;
+  font-family: var(--font-mono);
+}
+
+.erp-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.erp-command-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-erp-action {
+  font-size: 11px;
+}
+
+/* Visual Lockout State Banner */
+.lockout-alert-box {
   background: #FEF2F2;
   border: 2px solid var(--color-danger);
-  border-radius: 6px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
-  animation: pop-up 0.2s ease-out;
+  border-radius: 8px;
+  padding: 12px 16px;
+  animation: fadeIn 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.lockout-hero-banner.hidden { display: none; }
+.lockout-alert-box.hidden {
+  display: none;
+}
 
-.lh-header {
+.lab-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 4px;
 }
 
-.lh-icon { font-size: 20px; }
-.lh-header strong { color: var(--color-danger); font-size: 13px; }
-.lh-header p { font-size: 11px; color: var(--text-muted); }
-.lh-action {
-  font-family: var(--font-mono);
-  font-size: 10px;
+.lab-icon {
+  font-size: 24px;
+}
+
+.lab-title {
+  font-size: 13px;
   font-weight: 700;
-  color: #991B1B;
-  background: #FEE2E2;
-  padding: 4px 8px;
-  border-radius: 4px;
+  color: var(--color-danger);
+  letter-spacing: 0.02em;
+}
+
+.lab-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.lab-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+  background: #FFF;
+  border: 1px solid var(--color-danger-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.lab-k { color: var(--text-light); }
+.lab-v { color: var(--text-main); }
+
+/* Endpoint Test Strip */
+.endpoint-test-strip {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.test-btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-test-action {
+  flex: 1;
+  min-width: 140px;
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+.btn-danger-hero-sm {
+  background: #FEF2F2;
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.btn-danger-hero-sm:hover {
+  background: var(--color-danger);
+  color: #FFF;
+}
+
+/* Ledger Header */
+.ledger-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
 .scan-ledger-wrap {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .ledger-table {
@@ -1377,6 +1628,23 @@ body {
   color: var(--text-light);
   padding: 16px;
   font-family: var(--font-sans);
+}
+
+.install-cmd-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #F8FAFC;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 6px;
+}
+
+.install-cmd-box code {
+  color: var(--text-main);
+  word-break: break-all;
 }
 
 /* ==========================================================================

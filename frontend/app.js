@@ -591,7 +591,14 @@ function handleAgentStepEvent(ev, bulletinType) {
     stepStatus2.textContent = '100% BLOCKED';
     telLatency.textContent = tStr || '32ms';
 
-    setBranchTopologyLocked(true);
+    setBranchTopologyLocked(true, ev.gtin, ev.lots);
+    appendAuditLedgerRow({
+      target: 'All Regional Endpoints (14 Nodes)',
+      drug: `GTIN ${ev.gtin}`,
+      lot: (ev.lots || []).join(', '),
+      outcomeHtml: `<span class="badge badge-danger">CENTRAL KILL-SWITCH</span> <span class="mono-xs bold text-crimson">Gemini Autonomous Quarantine Enforced via WebSocket Mesh</span>`,
+      latency: tStr || '32ms'
+    });
     appendTraceRow('🚨 PHYSICAL KILL-SWITCH DISPATCHED', `Locked GTIN ${ev.gtin} lots [${ev.lots.join(', ')}] across all registers`, tStr, 't-lockout');
   } else if (ev.type === 'inventory') {
     // STEP 3 STATE ACTIVATION
@@ -646,121 +653,159 @@ function formatPayload(obj) {
   }
 }
 
-// --- Step 2: Branch Topology & Interactive Scanner ---
+// --- Step 2: Distributed Edge Kill-Switch & Fleet Command Center ---
 const containmentBadge = document.getElementById('containment-badge');
 const containmentTime = document.getElementById('containment-time');
-const badgeKarolinska = document.getElementById('badge-karolinska');
-const badgeSoder = document.getElementById('badge-soder');
-const badgeApoteket = document.getElementById('badge-apoteket');
+const regActiveCount = document.getElementById('reg-active-count');
+const manualLockGtin = document.getElementById('manual-lock-gtin');
+const manualLockLot = document.getElementById('manual-lock-lot');
+const manualLockFacility = document.getElementById('manual-lock-facility');
+const btnEngageManualLock = document.getElementById('btn-engage-manual-lock');
+const activeLocksTbody = document.getElementById('active-locks-tbody');
+const lockRowAmimox = document.getElementById('lock-row-amimox');
+const lockLotsText = document.getElementById('lock-lots-text');
+const badgeLockStatus = document.getElementById('badge-lock-status');
+const btnReleaseLock = document.getElementById('btn-release-lock');
+
+const fleetFilterPills = document.getElementById('fleet-filter-pills');
+const erpStockStatusKarolinska = document.getElementById('erp-stock-status-karolinska');
 const scannersKarolinska1 = document.getElementById('scanners-karolinska-1');
 const scannersKarolinska2 = document.getElementById('scanners-karolinska-2');
 const scannersSoder = document.getElementById('scanners-soder');
 const scannersApoteket = document.getElementById('scanners-apoteket');
-const lockoutHeroBanner = document.getElementById('lockout-hero-banner');
+
+const erpControlCard = document.getElementById('erp-control-card');
+const terminalSelector = document.getElementById('terminal-selector');
+const btnSyncSap = document.getElementById('btn-sync-sap');
+const btnBroadcastPos = document.getElementById('btn-broadcast-pos');
+const btnResyncMesh = document.getElementById('btn-resync-mesh');
+const step2LockoutAlert = document.getElementById('step2-lockout-alert');
+const step2BtnScanA = document.getElementById('step2-btn-scan-a');
+const step2BtnScanB = document.getElementById('step2-btn-scan-b');
+const step2BtnScanC = document.getElementById('step2-btn-scan-c');
 const step2LedgerTbody = document.getElementById('step2-ledger-tbody');
 
 const lockoutModal = document.getElementById('lockout-modal');
 const btnCloseModal = document.getElementById('btn-close-modal');
+const btnCopyInstallCmd = document.getElementById('btn-copy-install-cmd');
 
-function setBranchTopologyLocked(isLocked) {
+let isMeshLocked = true; // Initial demo state reflects Class 1 bulletin readiness
+
+function setBranchTopologyLocked(isLocked, gtin = '07350012345678', lots = ['L9824B', 'L9824C']) {
+  isMeshLocked = isLocked;
+  const lotsList = Array.isArray(lots) ? lots : [lots];
+
   if (isLocked) {
-    containmentBadge.className = 'containment-badge locked';
-    containmentBadge.textContent = '100% CONTAINED: REGISTERS LOCKED';
-    containmentTime.textContent = 'Broadcast Execution: 32ms · SSE Duplex Broadcast';
+    if (containmentBadge) {
+      containmentBadge.className = 'containment-badge locked';
+      containmentBadge.textContent = '100% CONTAINED: REGISTERS LOCKED · SAP S/4HANA BLOCKED';
+    }
+    if (containmentTime) {
+      containmentTime.textContent = 'Fast Broadcast: 32ms via WebSocket / ZeroMQ Mesh';
+    }
 
-    badgeKarolinska.className = 'tree-status-badge status-locked';
-    badgeKarolinska.textContent = 'LOCKED (6 SCANNERS)';
-    scannersKarolinska1.textContent = '4/4 Scanners LOCKED';
-    scannersKarolinska1.className = 'child-detail locked';
-    scannersKarolinska2.textContent = '2/2 Scanners LOCKED';
-    scannersKarolinska2.className = 'child-detail locked';
+    if (erpStockStatusKarolinska) {
+      erpStockStatusKarolinska.textContent = 'ERP Stock: 0001 (Active) ➔ 0004 (Blocked)';
+    }
 
-    badgeSoder.className = 'tree-status-badge status-locked';
-    badgeSoder.textContent = 'LOCKED (6 SCANNERS)';
-    scannersSoder.textContent = '6/6 Scanners LOCKED';
-    scannersSoder.className = 'child-detail locked';
+    if (scannersKarolinska1) {
+      scannersKarolinska1.textContent = '4/4 Scanners LOCKED';
+      scannersKarolinska1.className = 'child-detail locked';
+    }
+    if (scannersKarolinska2) {
+      scannersKarolinska2.textContent = '2/2 Scanners LOCKED';
+      scannersKarolinska2.className = 'child-detail locked';
+    }
+    if (scannersSoder) {
+      scannersSoder.textContent = '6/6 Scanners LOCKED';
+      scannersSoder.className = 'child-detail locked';
+    }
+    if (scannersApoteket) {
+      scannersApoteket.textContent = '2/2 Scanners LOCKED';
+      scannersApoteket.className = 'child-detail locked';
+    }
 
-    badgeApoteket.className = 'tree-status-badge status-locked';
-    badgeApoteket.textContent = 'LOCKED (2 SCANNERS)';
-    scannersApoteket.textContent = '2/2 Scanners LOCKED';
-    scannersApoteket.className = 'child-detail locked';
+    if (step2LockoutAlert) {
+      step2LockoutAlert.classList.remove('hidden');
+    }
 
-    lockoutHeroBanner.classList.remove('hidden');
+    if (regActiveCount) {
+      regActiveCount.textContent = `1 Active Lockout (${lotsList.length} Lots)`;
+      regActiveCount.className = 'badge badge-danger';
+    }
+
+    if (lockLotsText) {
+      lockLotsText.textContent = lotsList.join(', ');
+    }
+
+    if (badgeLockStatus) {
+      badgeLockStatus.textContent = 'ENFORCED (32ms)';
+      badgeLockStatus.className = 'badge badge-danger';
+    }
+
+    if (lockRowAmimox) {
+      lockRowAmimox.style.display = '';
+    }
+
+    // Visual holy-cow moment: flash red border on control card
+    if (erpControlCard) {
+      erpControlCard.classList.remove('flash-alert');
+      void erpControlCard.offsetWidth;
+      erpControlCard.classList.add('flash-alert');
+      setTimeout(() => {
+        erpControlCard.classList.remove('flash-alert');
+      }, 1600);
+    }
   } else {
-    containmentBadge.className = 'containment-badge';
-    containmentBadge.textContent = 'STANDBY: REGISTERS ACTIVE';
-    containmentTime.textContent = 'Broadcast Latency: 32ms via SSE Duplex Push';
+    if (containmentBadge) {
+      containmentBadge.className = 'containment-badge';
+      containmentBadge.textContent = 'STANDBY: 14 ENDPOINTS ACTIVE · SAP S/4HANA SYNCED';
+    }
+    if (containmentTime) {
+      containmentTime.textContent = 'Fast Broadcast: 32ms via WebSocket / SSE Mesh';
+    }
 
-    badgeKarolinska.className = 'tree-status-badge status-open';
-    badgeKarolinska.textContent = 'ACTIVE (6 SCANNERS)';
-    scannersKarolinska1.textContent = '4/4 Scanners Operational';
-    scannersKarolinska1.className = 'child-detail';
-    scannersKarolinska2.textContent = '2/2 Scanners Operational';
-    scannersKarolinska2.className = 'child-detail';
+    if (erpStockStatusKarolinska) {
+      erpStockStatusKarolinska.textContent = 'ERP Stock: 0001 (Active) · Normal Operations';
+    }
 
-    badgeSoder.className = 'tree-status-badge status-open';
-    badgeSoder.textContent = 'ACTIVE (6 SCANNERS)';
-    scannersSoder.textContent = '6/6 Scanners Operational';
-    scannersSoder.className = 'child-detail';
+    if (scannersKarolinska1) {
+      scannersKarolinska1.textContent = '4/4 Scanners Operational';
+      scannersKarolinska1.className = 'child-detail';
+    }
+    if (scannersKarolinska2) {
+      scannersKarolinska2.textContent = '2/2 Scanners Operational';
+      scannersKarolinska2.className = 'child-detail';
+    }
+    if (scannersSoder) {
+      scannersSoder.textContent = '6/6 Scanners Operational';
+      scannersSoder.className = 'child-detail';
+    }
+    if (scannersApoteket) {
+      scannersApoteket.textContent = '2/2 Scanners Operational';
+      scannersApoteket.className = 'child-detail';
+    }
 
-    badgeApoteket.className = 'tree-status-badge status-open';
-    badgeApoteket.textContent = 'ACTIVE (2 SCANNERS)';
-    scannersApoteket.textContent = '2/2 Scanners Operational';
-    scannersApoteket.className = 'child-detail';
+    if (step2LockoutAlert) {
+      step2LockoutAlert.classList.add('hidden');
+    }
 
-    lockoutHeroBanner.classList.add('hidden');
+    if (regActiveCount) {
+      regActiveCount.textContent = '0 Active Lockouts';
+      regActiveCount.className = 'badge badge-success';
+    }
+
+    if (badgeLockStatus) {
+      badgeLockStatus.textContent = 'STANDBY (0 Active Locks)';
+      badgeLockStatus.className = 'badge badge-success';
+    }
   }
 }
 
-function setupScannerCard(boxId, btnId, laserId) {
-  const box = document.getElementById(boxId);
-  const btn = document.getElementById(btnId);
-  const laser = document.getElementById(laserId);
-  const gtin = box.dataset.gtin;
-  const lot = box.dataset.lot;
+// Format and append rows to the Real-Time Terminal & Transaction Audit Stream
+function appendAuditLedgerRow({ target, drug, lot, outcomeHtml, latency = '18ms' }) {
+  if (!step2LedgerTbody) return;
 
-  const performScan = async () => {
-    initAudio();
-
-    // Laser beam animation
-    laser.classList.remove('scanning');
-    void laser.offsetWidth;
-    laser.classList.add('scanning');
-
-    try {
-      const resp = await fetch(`/api/pos/scan?gtin=${encodeURIComponent(gtin)}&lot=${encodeURIComponent(lot)}`, {
-        method: 'POST'
-      });
-      const data = await resp.json();
-
-      if (resp.status === 200) {
-        playScanChime();
-        appendScanRow(data, true);
-      } else if (resp.status === 423) {
-        playBuzzer();
-        lockoutHeroBanner.classList.remove('hidden');
-        lockoutModal.classList.remove('hidden');
-        appendScanRow(data, false);
-      } else {
-        appendScanRow(data, false);
-      }
-    } catch (err) {
-      console.error('Scan error:', err);
-    }
-  };
-
-  box.addEventListener('click', performScan);
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    performScan();
-  });
-}
-
-setupScannerCard('step2-box-a', 'step2-btn-scan-a', 'step2-laser-a');
-setupScannerCard('step2-box-b', 'step2-btn-scan-b', 'step2-laser-b');
-setupScannerCard('step2-box-c', 'step2-btn-scan-c', 'step2-laser-c');
-
-function appendScanRow(item, isApproved) {
   const emptyRow = step2LedgerTbody.querySelector('.empty-row');
   if (emptyRow) emptyRow.remove();
 
@@ -769,22 +814,378 @@ function appendScanRow(item, isApproved) {
   const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0').slice(0, 2);
 
   tr.innerHTML = `
-    <td>${timeStr}</td>
-    <td><strong>${escapeHtml(item.brand_name)}</strong></td>
-    <td><span class="mono">${escapeHtml(item.lot)}</span></td>
-    <td>${item.price_sek ? item.price_sek.toFixed(2) + ' SEK' : '—'}</td>
-    <td>
-      <span class="${isApproved ? 'badge badge-success' : 'badge badge-danger'}">
-        ${isApproved ? 'APPROVED' : '423 LOCKED'}
-      </span>
-    </td>
+    <td class="mono-xs">${timeStr}</td>
+    <td><span class="mono-xs bold">${escapeHtml(target)}</span></td>
+    <td><strong>${escapeHtml(drug)}</strong> <span class="mono-xs text-muted">(${escapeHtml(lot)})</span></td>
+    <td>${outcomeHtml}</td>
+    <td><span class="mono-xs text-success bold">${escapeHtml(latency)}</span></td>
   `;
   step2LedgerTbody.prepend(tr);
+
+  // Keep table capped to 20 rows
+  while (step2LedgerTbody.children.length > 20) {
+    step2LedgerTbody.removeChild(step2LedgerTbody.lastChild);
+  }
 }
 
-btnCloseModal.addEventListener('click', () => {
-  lockoutModal.classList.add('hidden');
+// Seed initial authentic ledger history
+function seedInitialAuditLedger() {
+  appendAuditLedgerRow({
+    target: 'Karolinska Solna (POS-01)',
+    drug: 'Alvedon 500mg',
+    lot: 'P4401Z',
+    outcomeHtml: `<span class="badge badge-success">DISPENSED</span> <span class="mono-xs">Receipt #9281 · Stock -1 · SAP Loc 0001 Synced</span>`,
+    latency: '16ms'
+  });
+  appendAuditLedgerRow({
+    target: 'Mesh Broadcast (14 Nodes)',
+    drug: 'Amimox 500mg',
+    lot: 'L9824B',
+    outcomeHtml: `<span class="badge badge-danger">⛔ 423 BLOCKED</span> <span class="mono-xs bold text-crimson">SAP Event Emitted: Moved to Quarantined Storage 0004</span>`,
+    latency: '32ms'
+  });
+}
+seedInitialAuditLedger();
+
+// Fleet filter pills (All / POS / WMS / SAP ERP)
+if (fleetFilterPills) {
+  fleetFilterPills.addEventListener('click', (e) => {
+    const btn = e.target.closest('.fleet-tab');
+    if (!btn) return;
+    fleetFilterPills.querySelectorAll('.fleet-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+
+    const facilityCards = document.querySelectorAll('.fleet-facility-card');
+    facilityCards.forEach(card => {
+      let visibleCount = 0;
+      const rows = card.querySelectorAll('.fleet-node-row');
+      rows.forEach(row => {
+        const types = (row.dataset.type || '').split(' ');
+        if (filter === 'all' || types.includes(filter)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      card.style.display = visibleCount > 0 ? '' : 'none';
+    });
+  });
+}
+
+// Node actions: ⚡ Ping & ⚠️ Force Quarantine
+document.addEventListener('click', async (e) => {
+  const pingBtn = e.target.closest('.btn-ping-node');
+  if (pingBtn) {
+    const nodeName = pingBtn.dataset.node || 'Node';
+    const oldText = pingBtn.textContent;
+    pingBtn.textContent = '⚡ ...';
+    pingBtn.disabled = true;
+    setTimeout(() => {
+      const pingMs = Math.floor(Math.random() * 14) + 8;
+      pingBtn.textContent = `✓ ${pingMs}ms`;
+      appendAuditLedgerRow({
+        target: nodeName,
+        drug: 'Fleet Heartbeat',
+        lot: 'PING_CHECK',
+        outcomeHtml: `<span class="badge badge-success">200 OK</span> <span class="mono-xs">Duplex WebSocket ping ACK in ${pingMs}ms · Synchronized</span>`,
+        latency: `${pingMs}ms`
+      });
+      setTimeout(() => {
+        pingBtn.textContent = oldText;
+        pingBtn.disabled = false;
+      }, 1500);
+    }, 200);
+    return;
+  }
+
+  const quarBtn = e.target.closest('.btn-quarantine-node');
+  if (quarBtn) {
+    initAudio();
+    const nodeName = quarBtn.dataset.node || 'Node';
+    const isQuarantined = quarBtn.classList.contains('active-quarantined');
+    if (!isQuarantined) {
+      quarBtn.classList.add('active-quarantined');
+      quarBtn.textContent = 'Release Node';
+      quarBtn.classList.remove('btn-danger-outline');
+      quarBtn.classList.add('btn-success');
+      playBuzzer();
+      appendAuditLedgerRow({
+        target: nodeName,
+        drug: 'Node Isolation',
+        lot: 'FORCE_QUARANTINE',
+        outcomeHtml: `<span class="badge badge-danger">ISOLATED</span> <span class="mono-xs bold text-crimson">Node manually severed by Safety Director · Dispensing Suspended</span>`,
+        latency: '9ms'
+      });
+    } else {
+      quarBtn.classList.remove('active-quarantined');
+      quarBtn.textContent = 'Force Quarantine';
+      quarBtn.classList.remove('btn-success');
+      quarBtn.classList.add('btn-danger-outline');
+      playScanChime();
+      appendAuditLedgerRow({
+        target: nodeName,
+        drug: 'Node Isolation',
+        lot: 'RESTORE_ONLINE',
+        outcomeHtml: `<span class="badge badge-success">ONLINE</span> <span class="mono-xs">Node quarantine lifted · Normal dispensing resumed</span>`,
+        latency: '11ms'
+      });
+    }
+    return;
+  }
 });
+
+// Manual item lockout injection
+if (btnEngageManualLock) {
+  btnEngageManualLock.addEventListener('click', async () => {
+    initAudio();
+    const gtin = (manualLockGtin?.value || '07350012345678').trim();
+    const lot = (manualLockLot?.value || 'L9824B').trim();
+    const facility = manualLockFacility?.options[manualLockFacility.selectedIndex]?.text || 'All Regional Endpoints';
+
+    try {
+      const resp = await fetch('/api/quarantine/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gtin, lots: [lot] })
+      });
+      const data = await resp.json();
+
+      playBuzzer();
+      setBranchTopologyLocked(true, gtin, [lot]);
+
+      appendAuditLedgerRow({
+        target: facility,
+        drug: data.brand_name || 'Pharmaceutical Product',
+        lot: lot,
+        outcomeHtml: `<span class="badge badge-danger">MANUAL KILL-SWITCH</span> <span class="mono-xs bold text-crimson">Immediate fast-cache lock engaged across ${escapeHtml(facility)}</span>`,
+        latency: '24ms'
+      });
+    } catch (err) {
+      console.error('Manual lock error:', err);
+    }
+  });
+}
+
+// Release lock directive
+if (btnReleaseLock) {
+  btnReleaseLock.addEventListener('click', async () => {
+    initAudio();
+    const gtin = '07350012345678';
+    try {
+      const resp = await fetch('/api/quarantine/release', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gtin })
+      });
+      const data = await resp.json();
+
+      playScanChime();
+      setBranchTopologyLocked(false);
+
+      appendAuditLedgerRow({
+        target: 'All Regional Endpoints (14 Nodes)',
+        drug: 'Amimox 500mg',
+        lot: 'ALL LOTS',
+        outcomeHtml: `<span class="badge badge-success">LOCK RELEASED</span> <span class="mono-xs">Quarantine directive released · Normal dispensing restored</span>`,
+        latency: '18ms'
+      });
+    } catch (err) {
+      console.error('Release lock error:', err);
+    }
+  });
+}
+
+// ERP Action: Push Stock Mutation to SAP S/4HANA
+if (btnSyncSap) {
+  btnSyncSap.addEventListener('click', () => {
+    initAudio();
+    const oldText = btnSyncSap.innerHTML;
+    btnSyncSap.innerHTML = '<span>🚀 Syncing SAP RFC...</span>';
+    btnSyncSap.disabled = true;
+
+    setTimeout(() => {
+      playScanChime();
+      btnSyncSap.innerHTML = oldText;
+      btnSyncSap.disabled = false;
+      appendAuditLedgerRow({
+        target: 'SAP S/4HANA (Storage Loc 0004)',
+        drug: 'Amimox 500mg (L9824B, L9824C)',
+        lot: 'BAPI_GOODSMVT_CREATE',
+        outcomeHtml: `<span class="badge badge-primary">SAP COMMITTED</span> <span class="mono-xs bold">Movement Type 344 · 3,280 Units Moved: 0001 ➔ 0004 (Blocked)</span>`,
+        latency: '48ms'
+      });
+    }, 400);
+  });
+}
+
+// ERP Action: Broadcast Lockout to POS Mesh
+if (btnBroadcastPos) {
+  btnBroadcastPos.addEventListener('click', () => {
+    initAudio();
+    const oldText = btnBroadcastPos.innerHTML;
+    btnBroadcastPos.innerHTML = '<span>⚡ Broadcasting to Mesh...</span>';
+    btnBroadcastPos.disabled = true;
+
+    setTimeout(() => {
+      playBuzzer();
+      btnBroadcastPos.innerHTML = oldText;
+      btnBroadcastPos.disabled = false;
+      setBranchTopologyLocked(true);
+      appendAuditLedgerRow({
+        target: 'POS Mesh (14 Registers)',
+        drug: 'Amimox 500mg',
+        lot: 'ALL RECALLED LOTS',
+        outcomeHtml: `<span class="badge badge-danger">MESH ENFORCED</span> <span class="mono-xs bold text-crimson">ZeroMQ/WS hardware lockout pushed to 14 daemons · 14/14 ACK received</span>`,
+        latency: '28ms'
+      });
+    }, 350);
+  });
+}
+
+// ERP Action: Re-Sync Inventory Mesh
+if (btnResyncMesh) {
+  btnResyncMesh.addEventListener('click', () => {
+    initAudio();
+    const oldText = btnResyncMesh.innerHTML;
+    btnResyncMesh.innerHTML = '<span>🔄 Auditing Inventory Mesh...</span>';
+    btnResyncMesh.disabled = true;
+
+    setTimeout(() => {
+      playScanChime();
+      btnResyncMesh.innerHTML = oldText;
+      btnResyncMesh.disabled = false;
+      appendAuditLedgerRow({
+        target: 'Inventory Mesh Gateway',
+        drug: 'Central Inventory Ledger',
+        lot: 'CHECKSUM_AUDIT',
+        outcomeHtml: `<span class="badge badge-info">MESH AUDITED</span> <span class="mono-xs">Verified 3 facilities, 14 POS daemons, 2 WMS instances · 0 anomalies</span>`,
+        latency: '34ms'
+      });
+    }, 380);
+  });
+}
+
+// Rapid Audit Test Buttons (Replacing old barcode scanner simulator)
+function getSelectedTargetName() {
+  if (!terminalSelector) return 'Karolinska Solna (POS-01)';
+  const opt = terminalSelector.options[terminalSelector.selectedIndex];
+  return opt ? opt.text : 'Karolinska Solna (POS-01)';
+}
+
+if (step2BtnScanA) {
+  step2BtnScanA.addEventListener('click', async () => {
+    initAudio();
+    const gtin = '07350012345678';
+    const lot = 'L1100A';
+    const target = getSelectedTargetName();
+
+    try {
+      const resp = await fetch(`/api/pos/scan?gtin=${encodeURIComponent(gtin)}&lot=${encodeURIComponent(lot)}`, {
+        method: 'POST'
+      });
+      const data = await resp.json();
+      playScanChime();
+      appendAuditLedgerRow({
+        target,
+        drug: data.brand_name || 'Amimox 500mg',
+        lot,
+        outcomeHtml: `<span class="badge badge-success">DISPENSED</span> <span class="mono-xs">Receipt #${Math.floor(1000 + Math.random() * 9000)} · Stock -1 · SAP Loc 0001 (Active)</span>`,
+        latency: '14ms'
+      });
+    } catch (err) {
+      console.error('Scan error:', err);
+    }
+  });
+}
+
+if (step2BtnScanB) {
+  step2BtnScanB.addEventListener('click', async () => {
+    initAudio();
+    const gtin = '07350012345678';
+    const lot = 'L9824B';
+    const target = getSelectedTargetName();
+
+    try {
+      const resp = await fetch(`/api/pos/scan?gtin=${encodeURIComponent(gtin)}&lot=${encodeURIComponent(lot)}`, {
+        method: 'POST'
+      });
+      const data = await resp.json();
+
+      if (resp.status === 423) {
+        playBuzzer();
+        setBranchTopologyLocked(true);
+        if (lockoutModal) lockoutModal.classList.remove('hidden');
+
+        appendAuditLedgerRow({
+          target,
+          drug: data.brand_name || 'Amimox 500mg',
+          lot,
+          outcomeHtml: `<span class="badge badge-danger">⛔ 423 BLOCKED</span> <span class="mono-xs bold text-crimson">SAP Event Emitted: Moved to Quarantined Storage 0004 · Dispense Prevented</span>`,
+          latency: '26ms'
+        });
+      } else {
+        playScanChime();
+        appendAuditLedgerRow({
+          target,
+          drug: data.brand_name || 'Amimox 500mg',
+          lot,
+          outcomeHtml: `<span class="badge badge-success">DISPENSED</span> <span class="mono-xs">Receipt #${Math.floor(1000 + Math.random() * 9000)} · Stock -1 · SAP Loc 0001</span>`,
+          latency: '15ms'
+        });
+      }
+    } catch (err) {
+      console.error('Scan error:', err);
+    }
+  });
+}
+
+if (step2BtnScanC) {
+  step2BtnScanC.addEventListener('click', async () => {
+    initAudio();
+    const gtin = '07350099999999';
+    const lot = 'P4401Z';
+    const target = getSelectedTargetName();
+
+    try {
+      const resp = await fetch(`/api/pos/scan?gtin=${encodeURIComponent(gtin)}&lot=${encodeURIComponent(lot)}`, {
+        method: 'POST'
+      });
+      const data = await resp.json();
+      playScanChime();
+      appendAuditLedgerRow({
+        target,
+        drug: data.brand_name || 'Alvedon 500mg',
+        lot,
+        outcomeHtml: `<span class="badge badge-success">DISPENSED</span> <span class="mono-xs">Receipt #${Math.floor(1000 + Math.random() * 9000)} · Packaging audit note logged · SAP Loc 0001</span>`,
+        latency: '16ms'
+      });
+    } catch (err) {
+      console.error('Scan error:', err);
+    }
+  });
+}
+
+if (btnCloseModal) {
+  btnCloseModal.addEventListener('click', () => {
+    if (lockoutModal) lockoutModal.classList.add('hidden');
+  });
+}
+
+// Copy edge daemon install command in settings drawer
+if (btnCopyInstallCmd) {
+  btnCopyInstallCmd.addEventListener('click', () => {
+    const cmd = 'curl -sSL https://firebreak.io/install-pos.sh | bash -s -- --token=fbf_live_9921_karolinska_solna';
+    navigator.clipboard.writeText(cmd).then(() => {
+      const orig = btnCopyInstallCmd.textContent;
+      btnCopyInstallCmd.textContent = '✓ Copied to Clipboard!';
+      setTimeout(() => { btnCopyInstallCmd.textContent = orig; }, 1600);
+    }).catch(err => {
+      console.warn('Clipboard write failed:', err);
+    });
+  });
+}
 
 // --- Step 3: Depletion & Calculus View Updates ---
 const faUsable = document.getElementById('fa-usable');

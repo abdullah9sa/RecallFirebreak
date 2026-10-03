@@ -80,6 +80,29 @@ async def pos_scan(gtin: str, lot: str):
             "message": "Valid for customer dispensing."}
 
 
+@app.post("/api/quarantine/manual")
+async def manual_quarantine(request: Request):
+    data = await request.json()
+    gtin = data.get("gtin", "").strip()
+    lots = data.get("lots", [])
+    if isinstance(lots, str):
+        lots = [l.strip() for l in lots.split(",") if l.strip()]
+    if not gtin or not lots:
+        raise HTTPException(400, "Provide gtin and lots.")
+    added = state.add_to_quarantine(gtin, lots)
+    brand = _product_name(gtin) or "Pharmaceutical Product"
+    return {"status": "QUARANTINED", "gtin": gtin, "lots": lots, "brand_name": brand, "added": added}
+
+
+@app.post("/api/quarantine/release")
+async def release_quarantine(request: Request):
+    data = await request.json()
+    gtin = data.get("gtin", "").strip()
+    lot = data.get("lot", "").strip() or None
+    released = state.remove_from_quarantine(gtin, lot)
+    return {"status": "RELEASED", "gtin": gtin, "lot": lot, "released": released}
+
+
 @app.api_route("/api/bulletin/ingest", methods=["GET", "POST"])
 async def ingest(request: Request, type: Optional[str] = None):
     text: Optional[str] = None

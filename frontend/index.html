@@ -378,189 +378,327 @@
     </section>
 
     <!-- ====================================================================
-         STEP 2: EDGE KILL-SWITCH & BRANCH TOPOLOGY
+         STEP 2: DISTRIBUTED EDGE KILL-SWITCH & FLEET COMMAND CENTER
          ==================================================================== -->
     <section class="step-view" id="view-step-2">
       <div class="view-banner">
         <div class="banner-title">
           <span class="banner-step-tag">STEP 2</span>
-          <h2>Edge Kill-Switch & Regional Branch Containment</h2>
+          <div>
+            <h2>Distributed Edge Kill-Switch &amp; Fleet Command Center</h2>
+            <span class="banner-subtitle">Bidirectional quarantine synchronization across SAP S/4HANA, hospital WMS, and 14 edge POS registers</span>
+          </div>
         </div>
         <div class="containment-banner" id="containment-banner">
-          <span class="containment-badge" id="containment-badge">STANDBY: REGISTERS ACTIVE</span>
-          <span class="containment-time" id="containment-time">Broadcast Latency: 32ms via SSE Duplex Push</span>
+          <span class="containment-badge" id="containment-badge">STANDBY: 14 ENDPOINTS ACTIVE · SAP S/4HANA SYNCED</span>
+          <span class="containment-time" id="containment-time">Fast Broadcast: 32ms via WebSocket / SSE Mesh</span>
         </div>
       </div>
 
-      <div class="step-grid grid-2col">
-        <!-- Left: Regional Branch Hierarchy Tree -->
-        <div class="card">
-          <div class="card-header">
-            <h3>Regional Branch Topology (Region Stockholm)</h3>
-            <span class="header-note">Enterprise Endpoint Map</span>
+      <!-- Command Strip: Active Edge Lockout Registry & Manual Kill-Switch -->
+      <div class="card active-lockout-registry-card">
+        <div class="card-header registry-header">
+          <div class="reg-title-wrap">
+            <span class="reg-icon">🔒</span>
+            <div>
+              <h3>Active Edge Lockout Registry (In-Memory Fast Cache)</h3>
+              <span class="header-note">Sub-millisecond hardware-level dispense interdiction across all regional endpoints</span>
+            </div>
           </div>
-          <div class="card-body">
-            <p class="topology-intro">Real-time point-of-sale register lockout state across regional medical dispensaries.</p>
-            
-            <div class="topology-tree" id="topology-tree">
-              <!-- Karolinska Node -->
-              <div class="tree-node facility-node open" id="node-karolinska">
-                <div class="tree-node-row">
-                  <span class="tree-toggle">▼</span>
-                  <span class="tree-icon">🏥</span>
-                  <span class="tree-name">Karolinska University Hospital Solna</span>
-                  <span class="tree-status-badge status-open" id="badge-karolinska">ACTIVE (6 SCANNERS)</span>
-                </div>
-                <div class="tree-children">
-                  <div class="tree-child-row">
-                    <span class="tree-branch">├─</span>
-                    <span class="tree-icon">💊</span>
-                    <span class="child-name">Central Dispensary Level 02</span>
-                    <span class="child-detail" id="scanners-karolinska-1">4/4 Scanners Operational</span>
+          <div class="reg-stats">
+            <span class="badge badge-danger" id="reg-active-count">1 Active Lockout (2 Lots)</span>
+            <span class="mono-xs">Enforced on 14/14 Nodes</span>
+          </div>
+        </div>
+        <div class="card-body registry-body">
+          <!-- Manual Kill-Switch Injection Bar -->
+          <div class="manual-lockout-bar">
+            <span class="lbl-caps">⚡ Immediate Manual Override &amp; Item Lockout:</span>
+            <div class="mlb-form">
+              <input type="text" class="input-text mono" id="manual-lock-gtin" placeholder="GTIN (e.g. 07350012345678)" value="07350012345678">
+              <input type="text" class="input-text mono" id="manual-lock-lot" placeholder="Lot / Batch (e.g. L9824B)" value="L9824B">
+              <select class="input-select" id="manual-lock-facility">
+                <option value="ALL">All Regional Endpoints (14 Nodes)</option>
+                <option value="KAROLINSKA">Karolinska University Hospital Solna</option>
+                <option value="SODER">Södersjukhuset Hospital</option>
+                <option value="APOTEKET">Apoteket Vasagatan (Retail)</option>
+              </select>
+              <button class="btn btn-danger" id="btn-engage-manual-lock">
+                <span>🚨 Engage Immediate Kill-Switch</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Locks Table -->
+          <div class="active-locks-table-wrap">
+            <table class="active-locks-table">
+              <thead>
+                <tr>
+                  <th>GTIN</th>
+                  <th>Target Drug</th>
+                  <th>Recalled Lots</th>
+                  <th>Rule / Authority</th>
+                  <th>Enforcement Scope</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="active-locks-tbody">
+                <tr id="lock-row-amimox">
+                  <td class="mono bold">07350012345678</td>
+                  <td><strong>Amimox 500mg</strong></td>
+                  <td><span class="mono bold text-crimson" id="lock-lots-text">L9824B, L9824C</span></td>
+                  <td>Läkemedelsverket Class 1 (#LV-2026-0912)</td>
+                  <td>All Facilities (14/14 Nodes)</td>
+                  <td><span class="badge badge-danger" id="badge-lock-status">ENFORCED (32ms)</span></td>
+                  <td><button class="btn btn-xs btn-outline btn-release-lock" id="btn-release-lock">Release Lock</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Step 2 Grid: Left (Connected Fleet Mesh) + Right (ERP Dispatch & Audit Stream) -->
+      <div class="step-grid grid-2col step2-main-grid">
+        
+        <!-- Left: Connected Systems & Fleet Health -->
+        <div class="card fleet-health-card">
+          <div class="card-header fleet-header">
+            <div>
+              <h3>Connected Systems &amp; Fleet Health</h3>
+              <span class="header-note">Distributed Edge &amp; Integration Mesh</span>
+            </div>
+            <div class="fleet-filter-pills" id="fleet-filter-pills">
+              <button class="fleet-tab active" data-filter="all">All Endpoints (14)</button>
+              <button class="fleet-tab" data-filter="pos">POS (8)</button>
+              <button class="fleet-tab" data-filter="wms">WMS (4)</button>
+              <button class="fleet-tab" data-filter="erp">SAP S/4HANA</button>
+            </div>
+          </div>
+          <div class="card-body fleet-card-body">
+            <div class="fleet-node-list" id="fleet-node-list">
+
+              <!-- Facility 1: Karolinska -->
+              <div class="fleet-facility-card" data-facility="karolinska">
+                <div class="ffc-header">
+                  <div class="ffc-title">
+                    <span class="ffc-icon">🏥</span>
+                    <strong>Karolinska University Hospital Solna</strong>
                   </div>
-                  <div class="tree-child-row">
-                    <span class="tree-branch">└─</span>
-                    <span class="tree-icon">🚨</span>
-                    <span class="child-name">Emergency Ward A Dispensary</span>
-                    <span class="child-detail" id="scanners-karolinska-2">2/2 Scanners Operational</span>
+                  <span class="badge badge-success">HEALTHY</span>
+                </div>
+                <div class="ffc-nodes">
+                  <!-- Node 1: WMS -->
+                  <div class="fleet-node-row" data-type="wms erp" id="fnode-karolinska-wms">
+                    <div class="fnr-main">
+                      <div class="fnr-title">
+                        <span class="fnr-type-badge badge-wms">WMS</span>
+                        <span class="fnr-name">Central Logistics Gateway (SAP RFC)</span>
+                      </div>
+                      <div class="fnr-meta mono-xs">
+                        <span>WS ping: <strong class="text-success">14ms</strong></span> · 
+                        <span>Sync: <strong>100%</strong></span> · 
+                        <span class="badge-erp-status" id="erp-stock-status-karolinska">ERP Stock: 0001 (Active) ➔ 0004 (Blocked)</span>
+                      </div>
+                    </div>
+                    <div class="fnr-actions">
+                      <button class="btn btn-xs btn-outline btn-ping-node" data-node="Karolinska WMS">⚡ Ping</button>
+                      <button class="btn btn-xs btn-danger-outline btn-quarantine-node" data-node="Karolinska WMS">Force Quarantine</button>
+                    </div>
+                  </div>
+
+                  <!-- Node 2: POS Level 02 -->
+                  <div class="fleet-node-row" data-type="pos" id="fnode-karolinska-pos-1">
+                    <div class="fnr-main">
+                      <div class="fnr-title">
+                        <span class="fnr-type-badge badge-pos">POS</span>
+                        <span class="fnr-name">Central Dispensary Level 02</span>
+                      </div>
+                      <div class="fnr-meta mono-xs">
+                        <span>WS ping: <strong class="text-success">8ms</strong></span> · 
+                        <span class="child-detail locked" id="scanners-karolinska-1">4/4 Scanners LOCKED</span>
+                      </div>
+                    </div>
+                    <div class="fnr-actions">
+                      <button class="btn btn-xs btn-outline btn-ping-node" data-node="Karolinska Level 02">⚡ Ping</button>
+                      <button class="btn btn-xs btn-danger-outline btn-quarantine-node" data-node="Karolinska Level 02">Force Quarantine</button>
+                    </div>
+                  </div>
+
+                  <!-- Node 3: Emergency Ward A -->
+                  <div class="fleet-node-row" data-type="pos" id="fnode-karolinska-pos-2">
+                    <div class="fnr-main">
+                      <div class="fnr-title">
+                        <span class="fnr-type-badge badge-pos">POS</span>
+                        <span class="fnr-name">Emergency Ward A Dispensary</span>
+                      </div>
+                      <div class="fnr-meta mono-xs">
+                        <span>ZeroMQ ping: <strong class="text-success">11ms</strong></span> · 
+                        <span class="child-detail locked" id="scanners-karolinska-2">2/2 Scanners LOCKED</span>
+                      </div>
+                    </div>
+                    <div class="fnr-actions">
+                      <button class="btn btn-xs btn-outline btn-ping-node" data-node="Emergency Ward A">⚡ Ping</button>
+                      <button class="btn btn-xs btn-danger-outline btn-quarantine-node" data-node="Emergency Ward A">Force Quarantine</button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Södersjukhuset Node -->
-              <div class="tree-node facility-node open" id="node-soder">
-                <div class="tree-node-row">
-                  <span class="tree-toggle">▼</span>
-                  <span class="tree-icon">🏥</span>
-                  <span class="tree-name">Södersjukhuset Hospital</span>
-                  <span class="tree-status-badge status-open" id="badge-soder">ACTIVE (6 SCANNERS)</span>
+              <!-- Facility 2: Södersjukhuset -->
+              <div class="fleet-facility-card" data-facility="soder">
+                <div class="ffc-header">
+                  <div class="ffc-title">
+                    <span class="ffc-icon">🏥</span>
+                    <strong>Södersjukhuset Hospital</strong>
+                  </div>
+                  <span class="badge badge-success">HEALTHY</span>
                 </div>
-                <div class="tree-children">
-                  <div class="tree-child-row">
-                    <span class="tree-branch">└─</span>
-                    <span class="tree-icon">💊</span>
-                    <span class="child-name">Main Clinical Pharmacy</span>
-                    <span class="child-detail" id="scanners-soder">6/6 Scanners Operational</span>
+                <div class="ffc-nodes">
+                  <!-- Node 4: Main Clinical Pharmacy -->
+                  <div class="fleet-node-row" data-type="pos wms" id="fnode-soder-pos">
+                    <div class="fnr-main">
+                      <div class="fnr-title">
+                        <span class="fnr-type-badge badge-pos">POS</span>
+                        <span class="fnr-name">Main Clinical Dispensary (Oracle HL7)</span>
+                      </div>
+                      <div class="fnr-meta mono-xs">
+                        <span>FHIR ping: <strong class="text-success">19ms</strong></span> · 
+                        <span class="child-detail locked" id="scanners-soder">6/6 Scanners LOCKED</span>
+                      </div>
+                    </div>
+                    <div class="fnr-actions">
+                      <button class="btn btn-xs btn-outline btn-ping-node" data-node="Södersjukhuset Dispensary">⚡ Ping</button>
+                      <button class="btn btn-xs btn-danger-outline btn-quarantine-node" data-node="Södersjukhuset Dispensary">Force Quarantine</button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Apoteket Vasagatan Node -->
-              <div class="tree-node facility-node open" id="node-apoteket">
-                <div class="tree-node-row">
-                  <span class="tree-toggle">▼</span>
-                  <span class="tree-icon">🏪</span>
-                  <span class="tree-name">Apoteket Vasagatan (Retail Hub)</span>
-                  <span class="tree-status-badge status-open" id="badge-apoteket">ACTIVE (2 SCANNERS)</span>
+              <!-- Facility 3: Apoteket Vasagatan -->
+              <div class="fleet-facility-card" data-facility="apoteket">
+                <div class="ffc-header">
+                  <div class="ffc-title">
+                    <span class="ffc-icon">🏪</span>
+                    <strong>Apoteket Vasagatan (Retail Hub)</strong>
+                  </div>
+                  <span class="badge badge-success">HEALTHY</span>
                 </div>
-                <div class="tree-children">
-                  <div class="tree-child-row">
-                    <span class="tree-branch">└─</span>
-                    <span class="tree-icon">🖥️</span>
-                    <span class="child-name">Checkout Register 01 & 02</span>
-                    <span class="child-detail" id="scanners-apoteket">2/2 Scanners Operational</span>
+                <div class="ffc-nodes">
+                  <!-- Node 5: Checkout Registers -->
+                  <div class="fleet-node-row" data-type="pos" id="fnode-apoteket-pos">
+                    <div class="fnr-main">
+                      <div class="fnr-title">
+                        <span class="fnr-type-badge badge-pos">POS</span>
+                        <span class="fnr-name">Checkout Registers 01 &amp; 02</span>
+                      </div>
+                      <div class="fnr-meta mono-xs">
+                        <span>MQTT ping: <strong class="text-success">22ms</strong></span> · 
+                        <span class="child-detail locked" id="scanners-apoteket">2/2 Scanners LOCKED</span>
+                      </div>
+                    </div>
+                    <div class="fnr-actions">
+                      <button class="btn btn-xs btn-outline btn-ping-node" data-node="Apoteket Vasagatan">⚡ Ping</button>
+                      <button class="btn btn-xs btn-danger-outline btn-quarantine-node" data-node="Apoteket Vasagatan">Force Quarantine</button>
+                    </div>
                   </div>
                 </div>
               </div>
+
             </div>
 
-            <div class="topology-footer">
-              <div><strong>TOTAL ENTERPRISE REACH:</strong> 3 Facilities · 14 Scanners Active</div>
-              <div><strong>PROTOCOL:</strong> Fast Broadcast Frame (<span class="mono">SSE / WebSocket</span>)</div>
+            <div class="fleet-footer">
+              <div><strong>TOTAL REACH:</strong> 3 Facilities · 14 Scanners · 2 WMS Core Instances</div>
+              <div><strong>TRANSPORT:</strong> WebSocket / ZeroMQ Mesh (<span class="mono text-success">32ms Broadcast</span>)</div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Interactive Register Simulator -->
-        <div class="card">
-          <div class="card-header">
-            <h3>Interactive Register Simulator</h3>
-            <span class="badge badge-pos-online">Terminal: Karolinska Solna POS-01</span>
+        <!-- Right: ERP & POS Dispatch Command Center + Real-Time Audit Stream -->
+        <div class="card erp-control-card" id="erp-control-card">
+          <div class="card-header erp-header">
+            <div>
+              <h3>ERP &amp; POS Dispatch Command Center</h3>
+              <span class="header-note">Autonomous Stock Mutation &amp; Interception Stream</span>
+            </div>
+            <div class="terminal-selector-wrap">
+              <label for="terminal-selector" class="mono-xs">Target Device:</label>
+              <select class="input-select terminal-select-sm" id="terminal-selector">
+                <option value="ALL">All Endpoints (Mesh Broadcast)</option>
+                <option value="KAROLINSKA-POS-01">Karolinska Solna — POS-01 (Level 02)</option>
+                <option value="KAROLINSKA-WMS">Karolinska Solna — WMS Storage 0001</option>
+                <option value="SODER-MAIN">Södersjukhuset — Dispensary POS-03</option>
+                <option value="APOTEKET-01">Apoteket Vasagatan — Register 01</option>
+              </select>
+            </div>
           </div>
-          <div class="card-body">
-            <p class="section-hint">Click any drug package to simulate laser scanning at frontline dispensing:</p>
-
-            <div class="med-scanner-grid">
-              <!-- Box A: Safe Amimox -->
-              <div class="med-box" id="step2-box-a" data-gtin="07350012345678" data-lot="L1100A">
-                <div class="laser-line" id="step2-laser-a"></div>
-                <div class="box-badge-row">
-                  <span class="badge badge-safe">SAFE BATCH</span>
-                  <span class="mono-xs">Vnr 123456</span>
-                </div>
-                <h4 class="box-title">Amimox 500 mg</h4>
-                <div class="box-meta">
-                  <span>LOT: <strong class="mono">L1100A</strong></span>
-                  <span>EXP: 2027-08</span>
-                </div>
-                <div class="mini-barcode"></div>
-                <button class="btn btn-xs btn-scan" id="step2-btn-scan-a">⚡ Scan Box A (Safe)</button>
-              </div>
-
-              <!-- Box B: Target Recalled Lot -->
-              <div class="med-box target-box" id="step2-box-b" data-gtin="07350012345678" data-lot="L9824B">
-                <div class="laser-line" id="step2-laser-b"></div>
-                <div class="box-badge-row">
-                  <span class="badge badge-target" id="step2-badge-b">RECALL TARGET</span>
-                  <span class="mono-xs">Vnr 123456</span>
-                </div>
-                <h4 class="box-title">Amimox 500 mg</h4>
-                <div class="box-meta">
-                  <span>LOT: <strong class="mono text-crimson">L9824B</strong></span>
-                  <span>EXP: 2026-11</span>
-                </div>
-                <div class="mini-barcode"></div>
-                <button class="btn btn-xs btn-scan" id="step2-btn-scan-b">⚡ Scan Box B (Target)</button>
-              </div>
-
-              <!-- Box C: Control Alvedon -->
-              <div class="med-box" id="step2-box-c" data-gtin="07350099999999" data-lot="P4401Z">
-                <div class="laser-line" id="step2-laser-c"></div>
-                <div class="box-badge-row">
-                  <span class="badge badge-control">CONTROL</span>
-                  <span class="mono-xs">Vnr 998877</span>
-                </div>
-                <h4 class="box-title">Alvedon 500 mg</h4>
-                <div class="box-meta">
-                  <span>LOT: <strong class="mono">P4401Z</strong></span>
-                  <span>EXP: 2028-02</span>
-                </div>
-                <div class="mini-barcode"></div>
-                <button class="btn btn-xs btn-scan" id="step2-btn-scan-c">⚡ Scan Box C (Control)</button>
-              </div>
+          <div class="card-body erp-card-body">
+            
+            <!-- ERP Command Actions Strip -->
+            <div class="erp-command-bar">
+              <button class="btn btn-primary btn-erp-action" id="btn-sync-sap">
+                <span>🚀 Push Stock Mutation to SAP S/4HANA</span>
+              </button>
+              <button class="btn btn-danger-outline btn-erp-action" id="btn-broadcast-pos">
+                <span>⚡ Broadcast Lockout to POS Mesh (14 Nodes)</span>
+              </button>
+              <button class="btn btn-outline btn-erp-action" id="btn-resync-mesh">
+                <span>🔄 Re-Sync Inventory Mesh</span>
+              </button>
             </div>
 
-            <!-- Lockout Climax Banner (when locked) -->
-            <div class="lockout-hero-banner hidden" id="lockout-hero-banner">
-              <div class="lh-header">
-                <span class="lh-icon">🚨</span>
+            <!-- Prominent Visual Lockout State Banner -->
+            <div class="lockout-alert-box" id="step2-lockout-alert">
+              <div class="lab-header">
+                <span class="lab-icon">⛔</span>
                 <div>
-                  <strong class="mono">423 DISPENSE_BLOCKED: TOXIC HAZARD</strong>
-                  <p>Läkemedelsverket Emergency Order #LV-2026-0912 · Lot L9824B</p>
+                  <h3 class="lab-title">DISPENSE INTERCEPTED (HTTP 423 LOCKED)</h3>
+                  <span class="lab-sub mono">Item: Amimox 500mg (Lot L9824B) · GTIN 07350012345678</span>
                 </div>
               </div>
-              <div class="lh-action">
-                ACTION: RETAIN IN RED HAZARD BIN · DO NOT DISPENSE TO PATIENT
+              <div class="lab-details-grid">
+                <div><span class="lab-k">Action:</span> <span class="lab-v text-crimson bold">Hardware Lockout Engaged</span></div>
+                <div><span class="lab-k">Latency:</span> <span class="lab-v mono">32ms via WebSocket Mesh</span></div>
+                <div><span class="lab-k">ERP Mutation:</span> <span class="lab-v mono">SAP Storage Loc 0001 ➔ 0004 (Blocked)</span></div>
+                <div><span class="lab-k">Quarantine Qty:</span> <span class="lab-v mono bold text-crimson">3,280 Units Frozen</span></div>
               </div>
             </div>
 
-            <!-- Itemized Receipt Table -->
+            <!-- Clean Operational Endpoint Verification Strip (Replaces barcode simulator) -->
+            <div class="endpoint-test-strip">
+              <span class="lbl-caps">Endpoint Verification &amp; Rapid Audit Test:</span>
+              <div class="test-btn-group">
+                <button class="btn btn-outline btn-test-action" id="step2-btn-scan-a">
+                  <span>⚡ Test Dispense Safe Batch (L1100A)</span>
+                </button>
+                <button class="btn btn-danger-hero-sm btn-test-action" id="step2-btn-scan-b">
+                  <span>🚨 Test Dispense Target Recall (L9824B)</span>
+                </button>
+                <button class="btn btn-outline btn-test-action" id="step2-btn-scan-c">
+                  <span>ℹ️ Test Dispense Control (P4401Z)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Real-Time Transaction & ERP Mutation Ledger Table -->
             <div class="scan-ledger-wrap">
-              <span class="lbl-caps">Terminal Scan Transaction Ledger</span>
+              <div class="ledger-header-row">
+                <span class="lbl-caps">Real-Time Terminal &amp; Transaction Audit Stream:</span>
+                <span class="mono-xs text-muted" id="audit-stream-status">Live WebSocket Stream Active</span>
+              </div>
               <table class="ledger-table">
                 <thead>
                   <tr>
                     <th>Time</th>
-                    <th>Product</th>
-                    <th>Lot</th>
-                    <th>Price</th>
-                    <th>Outcome</th>
+                    <th>Endpoint / Target</th>
+                    <th>Drug &amp; Lot</th>
+                    <th>Downstream ERP &amp; POS Mutation / Outcome</th>
+                    <th>Latency</th>
                   </tr>
                 </thead>
                 <tbody id="step2-ledger-tbody">
-                  <tr class="empty-row">
-                    <td colspan="5">No scans registered. Click a medication box above to scan.</td>
-                  </tr>
+                  <!-- Live audit rows will appear here -->
                 </tbody>
               </table>
             </div>
@@ -571,6 +709,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </section>
 
@@ -928,6 +1067,16 @@
             </div>
           </div>
           <button class="btn btn-outline btn-full" id="btn-add-node">+ Add Hospital / Retail Branch Node</button>
+        </div>
+
+        <!-- Section 4: Lightweight Edge Register Agent -->
+        <div class="drawer-section">
+          <h4>4. Edge Register Daemon Installer (Linux / POS / Windows)</h4>
+          <p class="section-hint">Deploy sub-50ms interdiction agent directly to frontline dispensing terminals:</p>
+          <div class="install-cmd-box">
+            <code class="mono-xs" id="daemon-install-cmd">curl -sSL https://firebreak.io/install-pos.sh | bash -s -- --token=fb_live_tok_99182</code>
+            <button class="btn btn-xs btn-outline" id="btn-copy-install-cmd">Copy</button>
+          </div>
         </div>
       </div>
     </div>

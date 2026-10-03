@@ -43,6 +43,21 @@ class GlobalStateStore:
         with self._lock:
             return [{"gtin": k[0], "lot": k[1]} for k in self._quarantined]
 
+    def remove_from_quarantine(self, gtin: str, lot: Optional[str] = None) -> int:
+        with self._lock:
+            gtin_clean = gtin.strip()
+            if lot:
+                key = (gtin_clean, lot.strip())
+                if key in self._quarantined:
+                    self._quarantined.remove(key)
+                    return 1
+                return 0
+            else:
+                to_remove = [k for k in self._quarantined if k[0] == gtin_clean]
+                for k in to_remove:
+                    self._quarantined.remove(k)
+                return len(to_remove)
+
     def apply_quarantine_inventory_drop(
         self,
         quarantined_count: int = 3280,
