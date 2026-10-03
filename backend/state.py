@@ -13,10 +13,10 @@ class GlobalStateStore:
             self._quarantined: Set[Tuple[str, str]] = set()
             
             # Karolinska University Hospital initial stock baseline
-            self._total_units: int = 5200
+            self._total_units: int = 4560
             self._quarantined_units: int = 0
             self._daily_burn_rate: float = 400.0  # units consumed per day
-            self._baseline_days: float = 11.4     # 4560 usable / 400 = 11.4 days
+            self._baseline_days: float = 11.4     # 4560 units / 400 per day = 11.4 days
             self._current_days: float = 11.4
             
             # Staged POs awaiting human approval
@@ -43,8 +43,17 @@ class GlobalStateStore:
         with self._lock:
             return [{"gtin": k[0], "lot": k[1]} for k in self._quarantined]
 
-    def apply_quarantine_inventory_drop(self, quarantined_count: int = 4500) -> Dict:
+    def apply_quarantine_inventory_drop(
+        self,
+        quarantined_count: int = 3280,
+        total_units: Optional[int] = None,
+        daily_burn: Optional[float] = None,
+    ) -> Dict:
         with self._lock:
+            if total_units is not None:
+                self._total_units = total_units
+            if daily_burn is not None:
+                self._daily_burn_rate = daily_burn
             self._quarantined_units = quarantined_count
             usable_units = max(0, self._total_units - self._quarantined_units)
             self._current_days = round(usable_units / self._daily_burn_rate, 1)

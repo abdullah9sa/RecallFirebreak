@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RecallFirebreak — Clinical Circuit Breaker & Sentinel Command</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Global Navigation & Telemetry Ribbon -->
+  <header class="global-header">
+    <div class="header-left">
+      <div class="brand">
+        <span class="brand-shield">🛡️</span>
+        <div class="brand-text">
+          <span class="brand-title">RecallFirebreak</span>
+          <span class="brand-sub">Region Stockholm · Clinical Circuit Breaker</span>
+        </div>
+      </div>
+      <div class="status-chip online" id="daemon-status">
+        <span class="pulse-dot"></span>
+        <span class="status-label">SENTINEL_DAEMON_ACTIVE</span>
+      </div>
+    </div>
+
+    <div class="telemetry-ribbon">
+      <div class="telemetry-chip condense-chip" title="Condense token compaction gateway">
+        <span class="chip-tag">CONDENSE.CHAT</span>
+        <span class="chip-val" id="condense-stats">1,840 → 410 tok (-77%)</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-tag">LOCKOUT SLA</span>
+        <span class="chip-val" id="telemetry-lockout">32ms</span>
+      </div>
+      <div class="telemetry-chip">
+        <span class="chip-tag">PIPELINE SLA</span>
+        <span class="chip-val" id="telemetry-pipeline">Idle</span>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button id="btn-sound" class="btn btn-outline" title="Toggle audio alerts">
+        <span id="sound-icon">🔊</span> <span id="sound-text">Sound: ON</span>
+      </button>
+      <button id="btn-reset" class="btn btn-danger-outline" title="Reset all state to baseline">
+        <span>↺ Reset Demo</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Split-Screen Workspace -->
+  <main class="split-workspace">
+    <!-- PANEL 1: Frontline Dispensary Register -->
+    <section class="panel panel-pos" id="panel-pos">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <span class="panel-tag">PANEL 1</span>
+          <h2>Frontline Dispensary Register</h2>
+        </div>
+        <div class="terminal-meta">
+          <span>TERM-04 · Karolinska Apoteket</span>
+          <span class="badge badge-pos-online">POINT-OF-SALE READY</span>
+        </div>
+      </div>
+
+      <div class="barcode-deck-container">
+        <div class="deck-header">
+          <h3>Medication Scanning Deck</h3>
+          <p class="section-hint">Click any drug package to simulate laser scanning at POS checkout.</p>
+        </div>
+
+        <div class="medication-grid">
+          <!-- Box A: Safe Amimox -->
+          <div class="med-card" id="card-box-a" data-gtin="07350012345678" data-lot="L1100A">
+            <div class="laser-scanner-line" id="laser-a"></div>
+            <div class="med-card-header">
+              <span class="badge badge-safe">SAFE BATCH</span>
+              <span class="vnr-tag">Vnr 123456</span>
+            </div>
+            <div class="med-card-body">
+              <h4 class="med-name">Amimox 500 mg</h4>
+              <p class="med-sub">Amoxicillin · 20 kapslar</p>
+              <div class="med-meta-grid">
+                <div><span class="lbl">GTIN:</span> <span class="mono">07350012345678</span></div>
+                <div><span class="lbl">LOT:</span> <span class="mono bold">L1100A</span></div>
+                <div><span class="lbl">EXP:</span> <span class="mono">2027-08</span></div>
+                <div><span class="lbl">ATC:</span> <span class="mono">J01CA04</span></div>
+              </div>
+            </div>
+            <div class="barcode-graphic">
+              <div class="fake-barcode"></div>
+              <span class="barcode-num">07350012345678</span>
+            </div>
+            <button class="btn btn-scan" id="btn-scan-a">⚡ Scan Box A</button>
+          </div>
+
+          <!-- Box B: Target Recalled Lot -->
+          <div class="med-card med-target" id="card-box-b" data-gtin="07350012345678" data-lot="L9824B">
+            <div class="laser-scanner-line" id="laser-b"></div>
+            <div class="med-card-header">
+              <span class="badge badge-target" id="badge-b">RECALL TARGET</span>
+              <span class="vnr-tag">Vnr 123456</span>
+            </div>
+            <div class="med-card-body">
+              <h4 class="med-name">Amimox 500 mg</h4>
+              <p class="med-sub">Amoxicillin · 20 kapslar</p>
+              <div class="med-meta-grid">
+                <div><span class="lbl">GTIN:</span> <span class="mono">07350012345678</span></div>
+                <div><span class="lbl">LOT:</span> <span class="mono bold text-crimson">L9824B</span></div>
+                <div><span class="lbl">EXP:</span> <span class="mono">2026-11</span></div>
+                <div><span class="lbl">ATC:</span> <span class="mono">J01CA04</span></div>
+              </div>
+            </div>
+            <div class="barcode-graphic">
+              <div class="fake-barcode"></div>
+              <span class="barcode-num">07350012345678</span>
+            </div>
+            <button class="btn btn-scan" id="btn-scan-b">⚡ Scan Box B (Target)</button>
+          </div>
+
+          <!-- Box C: Control Alvedon -->
+          <div class="med-card" id="card-box-c" data-gtin="07350099999999" data-lot="P4401Z">
+            <div class="laser-scanner-line" id="laser-c"></div>
+            <div class="med-card-header">
+              <span class="badge badge-control">CONTROL / CLASS 3</span>
+              <span class="vnr-tag">Vnr 998877</span>
+            </div>
+            <div class="med-card-body">
+              <h4 class="med-name">Alvedon 500 mg</h4>
+              <p class="med-sub">Paracetamol · 20 tabletter</p>
+              <div class="med-meta-grid">
+                <div><span class="lbl">GTIN:</span> <span class="mono">07350099999999</span></div>
+                <div><span class="lbl">LOT:</span> <span class="mono bold">P4401Z</span></div>
+                <div><span class="lbl">EXP:</span> <span class="mono">2028-02</span></div>
+                <div><span class="lbl">ATC:</span> <span class="mono">N02BE01</span></div>
+              </div>
+            </div>
+            <div class="barcode-graphic">
+              <div class="fake-barcode"></div>
+              <span class="barcode-num">07350099999999</span>
+            </div>
+            <button class="btn btn-scan" id="btn-scan-c">⚡ Scan Box C (Control)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POS Itemized Ledger -->
+      <div class="pos-ledger-container">
+        <div class="ledger-header">
+          <h3>Dispensing Register Audit Log</h3>
+          <span class="ledger-count" id="ledger-count">0 items scanned</span>
+        </div>
+        <div class="ledger-table-wrap">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Product</th>
+                <th>Lot #</th>
+                <th>Price</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-tbody">
+              <tr class="empty-row">
+                <td colspan="5">No scans registered. Click a medication box above to begin.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 2: Sentinel Surveillance & Autonomous Procurement -->
+    <section class="panel panel-sentinel" id="panel-sentinel">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <span class="panel-tag">PANEL 2</span>
+          <h2>Sentinel Surveillance & Procurement Desk</h2>
+        </div>
+        <div class="terminal-meta">
+          <span class="badge badge-gemini">GEMINI 3.8 FLASH · TOOL-CALLING</span>
+        </div>
+      </div>
+
+      <!-- Regulatory Intake Section -->
+      <div class="intake-section">
+        <div class="intake-header">
+          <h3>Regulatory Bulletin Intake Feeder</h3>
+          <span class="intake-source">Läkemedelsverket / EMA Directives</span>
+        </div>
+
+        <div class="sample-triggers-row">
+          <button class="btn-sample btn-sample-class1" id="btn-trigger-class1">
+            <span class="trigger-icon">⚠️</span>
+            <div class="trigger-text">
+              <span class="trigger-title">Load Class 1: Amimox Contamination</span>
+              <span class="trigger-desc">Toxic Particulates → Triggers Kill-Switch & Emergency PO</span>
+            </div>
+          </button>
+
+          <button class="btn-sample btn-sample-class3" id="btn-trigger-class3">
+            <span class="trigger-icon">ℹ️</span>
+            <div class="trigger-text">
+              <span class="trigger-title">Load Class 3: Alvedon Typography Misprint</span>
+              <span class="trigger-desc">Packaging Error → Autonomous Audit Only; NO Lockout</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Regional Inventory Run-Rate Burndown -->
+      <div class="inventory-gauge-card">
+        <div class="gauge-header">
+          <div class="gauge-title-wrap">
+            <h4>Karolinska Hospital · Regional Supply Reserve</h4>
+            <span class="stock-subtitle">Amoxicillin 500mg (Daily Burn Rate: 400 units/day)</span>
+          </div>
+          <div class="days-indicator" id="days-indicator">
+            <span class="days-num" id="days-val">11.4</span>
+            <span class="days-unit">DAYS RESERVE</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill fill-nominal" id="progress-fill" style="width: 81%;"></div>
+            <div class="threshold-marker" style="left: 28.5%;" title="Critical Shortage Floor (4 Days)">
+              <span class="marker-label">4-DAY FLOOR</span>
+            </div>
+          </div>
+        </div>
+        <div class="gauge-footer">
+          <span id="stock-units-label">4,560 usable units of 4,560 total stock</span>
+          <span class="badge badge-stock-status" id="stock-status-badge">RESERVE NOMINAL</span>
+        </div>
+      </div>
+
+      <!-- Staged Purchase Order Card (Hidden by default until agent drafts it) -->
+      <div class="po-card-container hidden" id="po-card">
+        <div class="po-card-header">
+          <div class="po-badge-group">
+            <span class="badge badge-po-urgent">EMERGENCY REQUISITION STAGED</span>
+            <span class="po-id mono" id="po-id-tag">PO-2026-0912</span>
+          </div>
+          <span class="po-sla">12-HOUR DELIVERY SLA</span>
+        </div>
+
+        <div class="po-card-body">
+          <div class="po-substitute-info">
+            <h4 class="substitute-name" id="po-sub-name">Spektramox 500mg/125mg</h4>
+            <p class="substitute-sub" id="po-sub-desc">WHO ATC: J01CR02 · Level 4 Bioequivalent</p>
+          </div>
+
+          <div class="po-meta-grid">
+            <div class="po-meta-item">
+              <span class="lbl">Supplier:</span>
+              <span class="val" id="po-supplier">Tamro AB Sweden</span>
+            </div>
+            <div class="po-meta-item">
+              <span class="lbl">Quantity:</span>
+              <span class="val mono bold" id="po-units">4,400 units</span>
+            </div>
+            <div class="po-meta-item">
+              <span class="lbl">Est. Total:</span>
+              <span class="val mono bold text-primary" id="po-cost">110,000 SEK</span>
+            </div>
+            <div class="po-meta-item">
+              <span class="lbl">Deficit Restored:</span>
+              <span class="val text-success">14.0 Days</span>
+            </div>
+          </div>
+
+          <div class="po-rationale-box">
+            <span class="lbl">Clinical Rationale:</span>
+            <p class="rationale-text" id="po-rationale">Batch L9824B quarantined. Reserve dropped below 4-day threshold. Spektramox verified in stock for immediate hospital restock.</p>
+          </div>
+        </div>
+
+        <div class="po-card-footer">
+          <div class="human-guardrail-note">
+            <span class="guardrail-icon">🛡️</span>
+            <span>Human-in-the-Loop Safety Rule: AI Agent cannot auto-execute financial orders.</span>
+          </div>
+          <button class="btn btn-approve-po" id="btn-approve-po">
+            ✓ Approve & Transmit Purchase Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Autonomous Agent Trace Stream -->
+      <div class="trace-container">
+        <div class="trace-header">
+          <div class="trace-header-left">
+            <span class="pulse-dot-sm"></span>
+            <h3>Autonomous Agent Live Decision Trace</h3>
+          </div>
+          <span class="trace-status" id="trace-status-text">Standby</span>
+        </div>
+
+        <div class="trace-stream" id="trace-stream">
+          <div class="trace-empty">
+            <span class="trace-empty-icon">⚡</span>
+            <p>Click a regulatory bulletin above to observe Gemini's tool-calling sequence in real time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Lockout Modal (The Climax) -->
+  <div class="lockout-modal-backdrop hidden" id="lockout-modal">
+    <div class="lockout-modal-card">
+      <div class="lockout-alert-header">
+        <div class="lockout-icon-pulse">🚨</div>
+        <div class="lockout-titles">
+          <span class="lockout-code mono">HTTP 423 DISPENSE_BLOCKED</span>
+          <h2 class="lockout-headline">CRITICAL HAZARD: REGULATORY KILL-SWITCH ACTIVE</h2>
+        </div>
+      </div>
+
+      <div class="lockout-details">
+        <div class="lockout-row">
+          <span class="k">PRODUCT:</span>
+          <span class="v" id="modal-product">Amimox 500 mg (Amoxicillin)</span>
+        </div>
+        <div class="lockout-row">
+          <span class="k">GTIN:</span>
+          <span class="v mono" id="modal-gtin">07350012345678</span>
+        </div>
+        <div class="lockout-row">
+          <span class="k">RECALLED LOT:</span>
+          <span class="v mono bold text-crimson" id="modal-lot">L9824B</span>
+        </div>
+        <div class="lockout-row">
+          <span class="k">AUTHORITY:</span>
+          <span class="v">Läkemedelsverket Directive #LV-2026-0912</span>
+        </div>
+        <div class="lockout-row">
+          <span class="k">REASON:</span>
+          <span class="v" id="modal-reason">Toxic microscopic particulate precipitation. Oral administration poses acute mucosal & toxicity threat.</span>
+        </div>
+      </div>
+
+      <div class="lockout-instructions">
+        <strong>CLINICAL ACTION MANDATE:</strong>
+        <p>DO NOT DISPENSE. Confiscate package from patient checkout and quarantine immediately in the designated Red Hazard Bin.</p>
+      </div>
+
+      <div class="lockout-actions">
+        <button class="btn btn-acknowledge" id="btn-close-modal">Acknowledge & Confiscate Package</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

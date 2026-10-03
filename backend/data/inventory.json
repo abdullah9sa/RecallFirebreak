@@ -10,20 +10,20 @@
           "substance": "Amoxicillin 500mg",
           "brand_name": "Amimox 500mg",
           "atc_code": "J01CA04",
-          "total_on_hand": 5200,
+          "total_on_hand": 4560,
           "daily_burn_rate": 400.0,
           "initial_days_supply": 11.4,
           "batches": [
             {
               "lot_number": "L1100A",
               "expiry_date": "2027-08",
-              "units": 700,
+              "units": 1280,
               "status": "SAFE"
             },
             {
               "lot_number": "L9824B",
               "expiry_date": "2026-11",
-              "units": 4500,
+              "units": 3280,
               "status": "TARGET_RECALL"
             }
           ]

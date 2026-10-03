@@ -9,9 +9,9 @@ This roadmap defines the sequential development, verification, and testing miles
 | Milestone | Target Time | Focus Area | Status |
 | :--- | :--- | :--- | :--- |
 | **Milestone 1** | 0:00 – 0:45 | Foundation: Mock Data, Pydantic Models & State | `[x] Completed` |
-| **Milestone 2** | 0:45 – 2:15 | Autonomous Core: Tools & Gemini Agent CLI Loop | `[ ] Not Started` |
-| **Milestone 3** | 2:15 – 3:30 | Backend API: FastAPI Server, SSE Pipeline & Reset | `[ ] Not Started` |
-| **Milestone 4** | 3:30 – 5:00 | Frontend: Split-Screen Clinical UI & Web Audio | `[ ] Not Started` |
+| **Milestone 2** | 0:45 – 2:15 | Autonomous Core: Tools & Gemini Agent CLI Loop | `[x] Completed` |
+| **Milestone 3** | 2:15 – 3:30 | Backend API: FastAPI Server, SSE Pipeline & Reset | `[x] Completed` |
+| **Milestone 4** | 3:30 – 5:00 | Frontend: Split-Screen Clinical UI & Web Audio | `[x] Completed` |
 | **Milestone 5** | 5:00 – 6:00 | Hardening: Fallback Fixture, Rehearsals & Pitch | `[ ] Not Started` |
 
 ---

@@ -230,7 +230,7 @@ RecallFirebreak/
 * **Auto-Requisition Staging Card**:
   * High-clarity order card:
     * **Substitute Product**: Spektramox 500mg/125mg (`J01CR02`) via Tamro AB Sweden.
-    * **Units Needed**: `5,000 units` (~125,000 SEK) to restore 14-day regional buffer.
+    * **Units Needed**: `4,400 units` (110,000 SEK) to restore 14-day regional buffer. Computed, not hardcoded: `(14 - 3.2) x 400/day`, rounded up to 100.
     * **Safety Rationale**: *"Batch L9824B quarantined. Bioequivalent substitute available locally with 12h delivery SLA."*
   * **Human-in-the-Loop Action**:
     * Clean, bold button: **[ Approve & Transmit Purchase Order ]**.
