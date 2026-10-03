@@ -78,6 +78,19 @@ def lock_items(ctx: RunContext, args: dict) -> dict:
         return {"error": "LOT_MISMATCH", "message": f"Lots not in extracted recall: {unknown or 'none given'}"}
 
     newly = state.add_to_quarantine(gtin, lots)
+
+    # Live ERPNext sync: disable item status in ERPNext immediately
+    erp_item_res = None
+    try:
+        from .erpnext_service import erpnext_client
+        erp_item_res = erpnext_client.set_item_status(
+            item_code=gtin,
+            disabled=True,
+            comment=f"QUARANTINED by RecallFirebreak Sentinel Agent. Swedish MPA recall {ctx.recall.bulletin_id}. Contaminated lot(s): {', '.join(lots)}.",
+        )
+    except Exception as exc:
+        erp_item_res = {"success": False, "error": str(exc)}
+
     ctx.emit({
         "type": "lockout",
         "gtin": gtin,
@@ -85,8 +98,9 @@ def lock_items(ctx: RunContext, args: dict) -> dict:
         "brand_name": ctx.recall.brand_name,
         "bulletin_id": ctx.recall.bulletin_id,
         "message": f"CRITICAL RECALL: {ctx.recall.recall_reason}",
+        "erpnext": erp_item_res,
     })
-    return {"status": "LOCKED", "gtin": gtin, "lots": lots, "newly_locked": newly}
+    return {"status": "LOCKED", "gtin": gtin, "lots": lots, "newly_locked": newly, "erpnext": erp_item_res}
 
 
 def get_inventory(ctx: RunContext, args: dict) -> dict:
@@ -211,10 +225,33 @@ def draft_purchase_order(ctx: RunContext, args: dict) -> dict:
         audit_rationale=rationale,
         created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     ).model_dump(mode="json")
+
+    # Live ERPNext sync: stage draft Purchase Order in ERPNext immediately
+    erp_po_res = None
+    try:
+        from .erpnext_service import erpnext_client
+        erp_po_res = erpnext_client.create_purchase_order(
+            item_code=alt["supplier_sku"],
+            qty=units,
+            rate=alt["unit_price_sek"],
+            supplier=alt.get("supplier_name", "Tamro AB Sweden"),
+            rationale=f"RecallFirebreak Sentinel Replenishment: {rationale}",
+        )
+        if erp_po_res.get("success"):
+            po["erpnext_po_id"] = erp_po_res.get("po_id")
+            po["erpnext_url"] = erp_po_res.get("url")
+            po["erpnext_grand_total"] = erp_po_res.get("grand_total")
+    except Exception as exc:
+        erp_po_res = {"success": False, "error": str(exc)}
+
     state.stage_po(po)
-    ctx.emit({"type": "po_draft", "po": po})
-    return {"status": "PO_STAGED_AWAITING_HUMAN_APPROVAL", "po_id": po["po_id"],
-            "estimated_cost_sek": po["estimated_cost_sek"]}
+    ctx.emit({"type": "po_draft", "po": po, "erpnext": erp_po_res})
+    return {
+        "status": "PO_STAGED_AWAITING_HUMAN_APPROVAL",
+        "po_id": po["po_id"],
+        "estimated_cost_sek": po["estimated_cost_sek"],
+        "erpnext": erp_po_res,
+    }
 
 
 def log_audit_note(ctx: RunContext, args: dict) -> dict:

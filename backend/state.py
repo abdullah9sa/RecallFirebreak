@@ -1,3 +1,4 @@
+import json
 import threading
 from typing import Set, Tuple, List, Dict, Optional
 
@@ -5,6 +6,112 @@ from typing import Set, Tuple, List, Dict, Optional
 class GlobalStateStore:
     def __init__(self):
         self._lock = threading.Lock()
+        self._default_settings = {
+            "automation_level": "assisted",  # "notify", "assisted", "full-auto"
+            "edge_latency_sla_ms": 50,
+            "critical_buffer_days": 4.0,
+            "target_replenishment_days": 14.0,
+            "sound_enabled": True,
+            "emails": [
+                {"id": "1", "name": "Chief Pharmacist", "email": "chief.pharmacist@regionstockholm.se", "scope": "all", "role": "Head of Clinical Pharmacy"},
+                {"id": "2", "name": "Hospital Safety Officer", "email": "safety.officer@karolinska.se", "scope": "class1", "role": "Toxicological Surveillance"},
+                {"id": "3", "name": "Procurement Director", "email": "procurement@karolinska.se", "scope": "orders", "role": "Supply Chain & PO Authorizer"},
+            ],
+            "email_gateway": {
+                "smtp_host": "mailrelay.regionstockholm.se",
+                "smtp_port": 587,
+                "sender": "sentinel@recallfirebreak.regionstockholm.se",
+                "tls": True
+            },
+            "notifications": {
+                "slack": {
+                    "enabled": True,
+                    "webhook_url": "https://hooks.slack.com/services/T00/B00/XXXX",
+                    "channel": "#pharmacy-safety",
+                    "events": ["class1_lockout", "po_approved", "low_stock"]
+                },
+                "teams": {
+                    "enabled": True,
+                    "webhook_url": "https://outlook.office.com/webhook/region-stockholm-desk",
+                    "channel": "Hospital Emergency Incident Desk",
+                    "events": ["class1_lockout", "po_approved"]
+                },
+                "pagerduty": {
+                    "enabled": True,
+                    "service_key": "PGR-SEC-9812",
+                    "on_call_phone": "+46 8 123 4567"
+                }
+            },
+            "integrations": {
+                "sap": {
+                    "name": "SAP S/4HANA",
+                    "enabled": True,
+                    "status": "connected",
+                    "type": "Hospital Enterprise ERP",
+                    "endpoint": "https://api.recallfirebreak.regionstockholm.se/v1/integrations/sap/requisitions",
+                    "client_id": "SAP-CL-98124",
+                    "company_code": "1000",
+                    "contract": "PO created as Purchase Requisition via SAP BAPI / OData. Human approval required."
+                },
+                "erpnext": {
+                    "name": "ERPNext Healthcare & Pharmacy",
+                    "enabled": True,
+                    "status": "connected",
+                    "type": "Healthcare & Pharmacy ERP (Local Instance)",
+                    "endpoint": "http://127.0.0.1:8003/api/resource/Purchase%20Order",
+                    "base_url": "http://127.0.0.1:8003",
+                    "api_key": "e574dc1238cafbc",
+                    "api_secret": "169c8afd0c089c8",
+                    "company": "fb",
+                    "warehouse": "Stores - F",
+                    "supplier": "Tamro AB Sweden",
+                    "contract": "Live ERPNext REST API. Stock ledger balance query, batch quarantine & instant purchase order dispatch."
+                },
+                "oracle": {
+                    "name": "Oracle Health (Cerner)",
+                    "enabled": False,
+                    "status": "standby",
+                    "type": "Clinical EHR Supply Chain",
+                    "endpoint": "https://cerner.regionstockholm.se/v1/supply",
+                    "contract": "Automated replenishment requisitions interfaced with Cerner Millennium."
+                },
+                "dynamics": {
+                    "name": "Microsoft Dynamics 365",
+                    "enabled": False,
+                    "status": "standby",
+                    "type": "D365 SCM Healthcare",
+                    "endpoint": "https://dynamics.regionstockholm.se/api/v1/orders",
+                    "contract": "Integrated with Dynamics Supply Chain Management."
+                },
+                "apoteket_pos": {
+                    "name": "Apoteket POS Mesh",
+                    "enabled": True,
+                    "status": "connected",
+                    "type": "National Pharmacy POS",
+                    "endpoint": "wss://edge.recallfirebreak.regionstockholm.se/v1/pos/mesh",
+                    "contract": "Real-time edge broadcast of zero-trust lockouts with sub-50ms SLA."
+                },
+                "generic_gs1": {
+                    "name": "Generic GS1 POS",
+                    "enabled": True,
+                    "status": "connected",
+                    "type": "GS1 Digital Link Protocol",
+                    "endpoint": "https://api.recallfirebreak.regionstockholm.se/v1/gs1/lockout",
+                    "contract": "GS1 standard Digital Link URI interception."
+                },
+                "condense": {
+                    "name": "Condense.chat Proxy & Gateway",
+                    "enabled": True,
+                    "status": "connected",
+                    "type": "Context Compression & Token Optimization Gateway",
+                    "api_key": "ck_sub_ragSH",
+                    "endpoint": "https://api.condense.chat/openai/v1",
+                    "model": "Adeline-1 Context Compactor",
+                    "contract": "Prunes redundant regulatory boilerplate while preserving 100% of critical clinical safety facts."
+                }
+            }
+        }
+        self._settings = json.loads(json.dumps(self._default_settings))
         self.reset()
 
     def reset(self):
@@ -24,6 +131,17 @@ class GlobalStateStore:
             
             # Last bulletin processed telemetry
             self._last_bulletin: Optional[Dict] = None
+
+            # Condense Context Compactor Telemetry (Before & After Stats)
+            self._condense_telemetry: Optional[Dict] = None
+
+    def set_condense_telemetry(self, stats: Dict):
+        with self._lock:
+            self._condense_telemetry = stats
+
+    def get_condense_telemetry(self) -> Optional[Dict]:
+        with self._lock:
+            return self._condense_telemetry
 
     def add_to_quarantine(self, gtin: str, lot_numbers: List[str]) -> int:
         with self._lock:
@@ -116,6 +234,25 @@ class GlobalStateStore:
                     self._current_days = 14.0
                     return po
             return None
+
+    def get_settings(self) -> Dict:
+        with self._lock:
+            return json.loads(json.dumps(self._settings))
+
+    def update_settings(self, updates: Dict) -> Dict:
+        with self._lock:
+            # Recursive or top-level dictionary merge
+            for key, val in updates.items():
+                if isinstance(val, dict) and key in self._settings and isinstance(self._settings[key], dict):
+                    self._settings[key].update(val)
+                else:
+                    self._settings[key] = val
+            return json.loads(json.dumps(self._settings))
+
+    def reset_settings(self) -> Dict:
+        with self._lock:
+            self._settings = json.loads(json.dumps(self._default_settings))
+            return json.loads(json.dumps(self._settings))
 
 
 # Global singleton instance

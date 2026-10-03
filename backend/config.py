@@ -28,7 +28,8 @@ def _env(*names: str, default: str = "") -> str:
 
 
 GEMINI_API_KEY = _env("GEMINI_API_KEY", "ai_studio_key")
-CONDENSE_API_KEY = _env("CONDENSE_API_KEY", "condense_api")
+CONDENSE_API_KEY = _env("CONDENSE_API_KEY", "condense_api", default="ck_sub_ragSH")
+CONDENSE_BASE_URL = _env("CONDENSE_BASE_URL", default="https://api.condense.chat/openai/v1").rstrip("/")
 
 DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
 LLM_BASE_URL = _env("LLM_BASE_URL", default=DEFAULT_BASE_URL).rstrip("/")
